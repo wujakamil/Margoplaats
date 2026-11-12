@@ -45,7 +45,6 @@
     <!-- Panel filtrów i wyszukiwarki -->
     <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-lg mb-6 space-y-4">
       
-      <!-- Górny rząd: Zakładki kategorii + Przycisk wystawiania -->
       <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
         <div class="flex flex-wrap gap-2" id="category-tabs">
           <button onclick="setCategory('all')" data-cat="all" class="cat-btn bg-amber-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2">
@@ -68,22 +67,19 @@
         </button>
       </div>
 
-      <!-- Dolny rząd: Wyszukiwarka po nazwie, filtr LVL, Światy i Waluty -->
+      <!-- Filtry dolne -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-3 border-t border-slate-800/80">
-        <!-- Szukaj po nazwie -->
         <div class="relative lg:col-span-2">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-sm"></i>
           <input type="text" id="filter-search" oninput="renderAuctions()" placeholder="Szukaj przedmiotu, profesji, opisu..." class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
         </div>
 
-        <!-- Wyszukiwarka po LVL -->
         <div class="flex items-center gap-2">
           <input type="number" id="filter-min-lvl" oninput="renderAuctions()" min="1" max="500" placeholder="Min LVL" class="w-1/2 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
           <span class="text-slate-500 text-xs">-</span>
           <input type="number" id="filter-max-lvl" oninput="renderAuctions()" min="1" max="500" placeholder="Max LVL" class="w-1/2 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
         </div>
 
-        <!-- Świat -->
         <div>
           <select id="filter-world" onchange="renderAuctions()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
             <option value="all">🌍 Wszystkie światy</option>
@@ -113,14 +109,11 @@
           </select>
         </div>
 
-        <!-- Waluta (PLN, k, m, g) -->
         <div>
           <select id="filter-currency" onchange="renderAuctions()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
-            <option value="all">💰 Wszystkie waluty</option>
-            <option value="PLN">PLN (zł)</option>
-            <option value="k">Złoto: Tysiące (k)</option>
-            <option value="m">Złoto: Miliony (m)</option>
-            <option value="g">Złoto: Miliardy (g)</option>
+            <option value="all">💰 PLN i Złoto</option>
+            <option value="PLN">Tylko PLN (zł)</option>
+            <option value="GOLD">Tylko Złoto (k/m/g)</option>
           </select>
         </div>
       </div>
@@ -161,7 +154,7 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Kategoria</label>
-            <select id="item-category" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+            <select id="item-category" onchange="toggleAccountLinkField()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
               <option value="Przedmioty">Przedmioty (Leg/Hero)</option>
               <option value="Konta">Konto / Postać</option>
               <option value="Złoto">Złoto (k / m / g)</option>
@@ -190,36 +183,57 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <!-- Pole linku do profilu (widoczne tylko dla Konta) -->
+        <div id="account-link-wrapper" class="hidden">
+          <label class="block text-xs uppercase tracking-wider text-purple-400 font-semibold mb-1">
+            <i class="fa-solid fa-link mr-1"></i> Link do profilu konta Margonem
+          </label>
+          <input type="url" id="item-profile-url" placeholder="https://www.margonem.pl/profile/view,..." class="w-full bg-slate-950 border border-purple-500/50 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-400">
+        </div>
+
+        <!-- Wybór typu sprzedaży i waluty -->
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Waluta</label>
-            <select id="item-currency" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-400 font-bold text-sm focus:outline-none focus:border-amber-500">
-              <option value="PLN">PLN (zł)</option>
-              <option value="k">1k (Tysiące)</option>
-              <option value="m">1m (Miliony)</option>
-              <option value="g">1g (Miliardy)</option>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Typ oferty</label>
+            <select id="item-sale-type" onchange="toggleSaleTypeFields()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+              <option value="both">Licytacja + Kup Teraz</option>
+              <option value="buynow">Tylko Kup Teraz (bez licytacji)</option>
+              <option value="auction">Tylko Licytacja</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Wywoławcza</label>
-            <input type="number" step="any" id="item-price" required min="0.1" placeholder="50" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Waluta</label>
+            <select id="item-currency" onchange="updatePriceHints()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-400 font-bold text-sm focus:outline-none focus:border-amber-500">
+              <option value="PLN">PLN (zł)</option>
+              <option value="GOLD">Złoto w grze (1k / 1m / 1g)</option>
+            </select>
           </div>
-          <div>
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Kup Teraz</label>
-            <input type="number" step="any" id="item-buynow" required min="0.1" placeholder="120" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+        </div>
+
+        <!-- Pola kwotowe z automatycznym formatowaniem 1k / 1m / 1g -->
+        <div class="grid grid-cols-2 gap-3">
+          <div id="start-price-wrapper">
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Cena wywoławcza</label>
+            <input type="text" id="item-price" oninput="previewFormattedAmount('item-price', 'price-preview')" placeholder="np. 50 lub 150m" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+            <span id="price-preview" class="text-[11px] text-amber-400 font-semibold block mt-1"></span>
+          </div>
+          <div id="buynow-price-wrapper">
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Cena Kup Teraz</label>
+            <input type="text" id="item-buynow" oninput="previewFormattedAmount('item-buynow', 'buynow-preview')" placeholder="np. 120 lub 1.5g" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+            <span id="buynow-preview" class="text-[11px] text-emerald-400 font-semibold block mt-1"></span>
           </div>
         </div>
 
         <div>
           <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">
-            Linki do zdjęć / screenów (możesz wkleić kilka, każdy w nowej linii lub po przecinku)
+            Linki do zdjęć / screenów (kilka linków oddziel przecinkiem lub nową linią)
           </label>
           <textarea id="item-imgs" rows="2" placeholder="https://i.imgur.com/screen1.png&#10;https://i.imgur.com/screen2.png" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500"></textarea>
         </div>
 
         <div>
           <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Opis / Płatność</label>
-          <textarea id="item-desc" rows="2" placeholder="np. Nieprzypisany, płatność BLIK, możliwy zaufany handlarz." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500"></textarea>
+          <textarea id="item-desc" rows="2" placeholder="np. Czysty, płatność BLIK, możliwy zaufany handlarz." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500"></textarea>
         </div>
 
         <label class="flex items-center gap-2.5 bg-slate-950 border border-slate-800 p-3 rounded-lg cursor-pointer">
@@ -234,7 +248,7 @@
     </div>
   </div>
 
-  <!-- Modal Zakupu i Kontaktu ze Sprzedawcą + Zaufany Handlarz -->
+  <!-- Modal Zakupu i Kontaktu ze Sprzedawcą -->
   <div id="buy-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
       <div class="flex justify-between items-center mb-4">
@@ -245,7 +259,6 @@
           <i class="fa-solid fa-xmark text-xl"></i>
         </button>
       </div>
-
       <div id="buy-modal-content" class="space-y-4"></div>
     </div>
   </div>
@@ -268,12 +281,12 @@
       </div>
       <div class="space-y-3 mb-4">
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Adres Webhook URL kanału z powiadomieniami / ticketami:</label>
+          <label class="block text-xs text-slate-400 mb-1">Adres Webhook URL kanału na serwerze Discord:</label>
           <input type="url" id="webhook-url-input" placeholder="https://discord.com/api/webhooks/..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
         </div>
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Nick/ID Zaufanego Handlarza (do oznaczenia w tickecie):</label>
-          <input type="text" id="middleman-tag-input" placeholder="np. @wujakamil" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+          <label class="block text-xs text-slate-400 mb-1">Discord ID Zaufanego Handlarza (do automatycznego kanału):</label>
+          <input type="text" id="middleman-id-input" placeholder="np. 372321000000000000" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
         </div>
       </div>
       <div class="flex gap-2">
@@ -297,18 +310,98 @@
     const SUPABASE_URL = "https://nyiojlbcrtkamcgclomn.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55aW9qbGJjcnRrYW1jZ2Nsb21uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0ODI5NTEsImV4cCI6MjExMDA1ODk1MX0.FZh5jhc-6VvSLwL0_Y4I0Wpee103Wy_tP740Uv4lmEk";
 
-    // Domyślny Zaufany Handlarz
-    const DEFAULT_MIDDLEMAN = "Wuja Kamil (@wujakamil)";
-
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = JSON.parse(localStorage.getItem('margo_discord_user')) || null;
     let activeCategory = 'all';
     let auctions = [];
-    let slideIndexMap = {}; // przechowuje aktualny numer zdjęcia dla każdej aukcji
+    let slideIndexMap = {};
 
     // ==========================================
-    // 2. LOGOWANIE DISCORD OAUTH2
+    // 2. PRZELICZNIK ZŁOTA (1000 -> 1k, 1000000 -> 1m, 1000000000 -> 1g)
+    // ==========================================
+    function parseAmountInput(rawStr, currency) {
+      if (!rawStr) return 0;
+      let str = String(rawStr).trim().toLowerCase().replace(/\s+/g, '').replace(',', '.');
+      if (currency === 'PLN') return parseFloat(str) || 0;
+
+      let multiplier = 1;
+      if (str.endsWith('k')) {
+        multiplier = 1000;
+        str = str.slice(0, -1);
+      } else if (str.endsWith('m')) {
+        multiplier = 1000000;
+        str = str.slice(0, -1);
+      } else if (str.endsWith('g')) {
+        multiplier = 1000000000;
+        str = str.slice(0, -1);
+      }
+      const val = parseFloat(str);
+      return isNaN(val) ? 0 : Math.round(val * multiplier);
+    }
+
+    function formatPrice(num, currency) {
+      const n = Number(num) || 0;
+      if (currency === 'PLN') return `${n} PLN`;
+
+      // Obsługa starych aukcji zapisanych w k/m/g
+      if (currency === 'k') return `${n}k`;
+      if (currency === 'm') return `${n}m`;
+      if (currency === 'g') return `${n}g`;
+
+      // Nowy automatyczny przelicznik: 1000 -> 1k, 1000000 -> 1m, 1000000000 -> 1g
+      if (n >= 1000000000) return parseFloat((n / 1000000000).toFixed(2)) + 'g';
+      if (n >= 1000000) return parseFloat((n / 1000000).toFixed(2)) + 'm';
+      if (n >= 1000) return parseFloat((n / 1000).toFixed(2)) + 'k';
+      return `${n} złota`;
+    }
+
+    function previewFormattedAmount(inputId, previewId) {
+      const curr = document.getElementById('item-currency').value;
+      const raw = document.getElementById(inputId).value;
+      const parsed = parseAmountInput(raw, curr);
+      const previewEl = document.getElementById(previewId);
+      if (!raw || parsed <= 0) {
+        previewEl.innerText = "";
+        return;
+      }
+      previewEl.innerText = `Wyświetli się jako: ${formatPrice(parsed, curr)}`;
+    }
+
+    function updatePriceHints() {
+      previewFormattedAmount('item-price', 'price-preview');
+      previewFormattedAmount('item-buynow', 'buynow-preview');
+    }
+
+    function toggleAccountLinkField() {
+      const cat = document.getElementById('item-category').value;
+      const wrapper = document.getElementById('account-link-wrapper');
+      if (cat === 'Konta') {
+        wrapper.classList.remove('hidden');
+      } else {
+        wrapper.classList.add('hidden');
+      }
+    }
+
+    function toggleSaleTypeFields() {
+      const saleType = document.getElementById('item-sale-type').value;
+      const startWrap = document.getElementById('start-price-wrapper');
+      const buyNowWrap = document.getElementById('buynow-price-wrapper');
+
+      if (saleType === 'buynow') {
+        startWrap.classList.add('hidden');
+        buyNowWrap.classList.remove('hidden');
+      } else if (saleType === 'auction') {
+        startWrap.classList.remove('hidden');
+        buyNowWrap.classList.add('hidden');
+      } else {
+        startWrap.classList.remove('hidden');
+        buyNowWrap.classList.remove('hidden');
+      }
+    }
+
+    // ==========================================
+    // 3. LOGOWANIE DISCORD OAUTH2
     // ==========================================
     function loginWithDiscord() {
       const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
@@ -368,7 +461,7 @@
             <div class="text-sm">
               <div class="font-bold text-white leading-tight flex items-center gap-1">
                 ${currentUser.username}
-                <i class="fa-solid fa-circle-check text-emerald-400 text-xs" title="Zweryfikowany przez Discord"></i>
+                <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
               </div>
               <div class="text-xs text-slate-400">@${currentUser.tag}</div>
             </div>
@@ -388,13 +481,19 @@
     }
 
     // ==========================================
-    // 3. PARSOWANIE DODATKOWYCH DANYCH (LVL, ZDJĘCIA, DISCORD ID)
+    // 4. ODCZYT METADANYCH AUKCJI
     // ==========================================
     function parseAuctionMeta(item) {
       let rawDesc = item.description || item.desc || "";
-      let meta = { lvl: null, discordTag: item.seller, discordId: "", middleman: true };
+      let meta = {
+        lvl: null,
+        discordTag: item.seller,
+        discordId: "",
+        middleman: true,
+        saleType: "both",
+        profileUrl: ""
+      };
 
-      // Odczyt zaszytego bloku meta z opisu (kompatybilne ze standardową tabelą Supabase)
       if (rawDesc.includes("|||META:")) {
         const parts = rawDesc.split("|||META:");
         rawDesc = parts[0];
@@ -404,13 +503,11 @@
         } catch (e) {}
       }
 
-      // Jeśli lvl nie był w meta, spróbuj wyciągnąć z tytułu np. "(120 lvl)"
       if (!meta.lvl) {
         const match = item.title.match(/(\d+)\s*lvl/i);
         if (match) meta.lvl = Number(match[1]);
       }
 
-      // Parsowanie wielu zdjęć (tablica JSON lub rozdzielone przecinkiem/nową linią)
       let images = [];
       if (item.img) {
         try {
@@ -425,7 +522,7 @@
     }
 
     // ==========================================
-    // 4. POBIERANIE I WYŚWIETLANIE AUKCJI
+    // 5. POBIERANIE I WYŚWIETLANIE AUKCJI
     // ==========================================
     async function fetchAuctions() {
       const { data, error } = await supabaseClient
@@ -465,7 +562,6 @@
       renderAuctions();
     }
 
-    // Zmiana zdjęcia w karuzeli na karcie
     function changeSlide(auctionId, dir, total) {
       const current = slideIndexMap[auctionId] || 0;
       slideIndexMap[auctionId] = (current + dir + total) % total;
@@ -495,7 +591,9 @@
         const { cleanDesc, meta } = parseAuctionMeta(a);
         const matchWorld = worldFilter === 'all' || a.world === worldFilter;
         const matchCat = activeCategory === 'all' || a.category === activeCategory;
-        const matchCurr = currencyFilter === 'all' || a.currency === currencyFilter;
+        
+        const isGold = a.currency !== 'PLN';
+        const matchCurr = currencyFilter === 'all' || (currencyFilter === 'PLN' && !isGold) || (currencyFilter === 'GOLD' && isGold);
         const matchSearch = !searchQuery || a.title.toLowerCase().includes(searchQuery) || cleanDesc.toLowerCase().includes(searchQuery);
         
         let matchLvl = true;
@@ -511,13 +609,14 @@
         grid.innerHTML = `
           <div class="col-span-full bg-slate-900/50 border border-slate-800 rounded-xl text-center py-12 text-slate-400">
             <i class="fa-solid fa-box-open text-3xl mb-2 text-slate-600 block"></i>
-            Brak aktywnych ofert dla wybranych filtrów (sprawdź przedział LVL lub walutę).
+            Brak aktywnych ofert dla wybranych filtrów.
           </div>`;
         return;
       }
 
       grid.innerHTML = filtered.map(item => {
         const { cleanDesc, meta, images } = parseAuctionMeta(item);
+        const saleType = meta.saleType || 'both';
 
         let badgeColor = "bg-amber-500/20 text-amber-400 border-amber-500/40";
         let icon = "fa-shield-halved";
@@ -529,7 +628,6 @@
           icon = "fa-coins";
         }
 
-        // Galeria kilku zdjęć na karcie
         let galleryHtml = '';
         if (images.length > 0) {
           const currentIndex = (slideIndexMap[item.id] || 0) % images.length;
@@ -547,7 +645,7 @@
           ` : '';
 
           galleryHtml = `
-            <div class="relative mb-3 group">
+            <div class="relative mb-3">
               <img src="${currentImg}" onclick="openLightbox('${currentImg}')" alt="${item.title}" class="w-full h-44 object-cover rounded-lg border border-slate-700 cursor-zoom-in">
               ${navBtns}
             </div>
@@ -556,6 +654,12 @@
 
         const lvlBadge = meta.lvl
           ? `<span class="text-xs bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-1 rounded font-bold">LVL ${meta.lvl}</span>`
+          : '';
+
+        const profileLinkBtn = (item.category === 'Konta' && meta.profileUrl)
+          ? `<a href="${meta.profileUrl}" target="_blank" rel="noopener noreferrer" class="mt-2 text-xs bg-purple-950/70 hover:bg-purple-900/80 border border-purple-600/50 text-purple-300 px-3 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition font-semibold">
+               <i class="fa-solid fa-up-right-from-square"></i> Zobacz profil konta na Margonem.pl
+             </a>`
           : '';
 
         const middlemanBadge = meta.middleman
@@ -569,7 +673,66 @@
           ? `<button onclick="deleteAuction(${item.id})" class="text-xs text-red-400 hover:text-red-300 cursor-pointer ml-2" title="Usuń swoją ofertę"><i class="fa-solid fa-trash"></i></button>`
           : '';
 
-        const suggestedMinBid = Number((Number(item.currentBid) + (item.currency === 'g' ? 0.5 : 1)).toFixed(2));
+        // Sekcja cen w zależności od typu oferty (Tylko Kup Teraz / Tylko Licytacja / Oba)
+        let priceDisplayHtml = '';
+        let actionButtonsHtml = '';
+
+        if (saleType === 'buynow') {
+          priceDisplayHtml = `
+            <div class="flex justify-between items-center mb-3 bg-emerald-950/30 border border-emerald-800/40 px-3 py-2 rounded-lg">
+              <span class="text-xs text-emerald-300 font-medium">Oferta Kup Teraz:</span>
+              <span class="text-2xl font-extrabold text-emerald-400">${formatPrice(item.buyNow, item.currency)}</span>
+            </div>
+          `;
+          actionButtonsHtml = `
+            <button onclick="openBuyModal(${item.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-sm transition cursor-pointer flex items-center justify-center gap-2">
+              <i class="fa-solid fa-cart-shopping"></i> Kup Teraz / Kontakt
+            </button>
+          `;
+        } else if (saleType === 'auction') {
+          priceDisplayHtml = `
+            <div class="mb-3">
+              <span class="text-xs text-slate-400 block">Aktualna licytacja (${item.bidsCount || 0}):</span>
+              <span class="text-2xl font-extrabold text-amber-400">${formatPrice(item.currentBid, item.currency)}</span>
+              <span class="text-xs text-slate-500 block">Prowadzi: <strong class="text-slate-300">${item.lastBidder}</strong></span>
+            </div>
+          `;
+          actionButtonsHtml = `
+            <div class="flex gap-2">
+              <input type="text" id="bid-input-${item.id}" placeholder="Wpisz kwotę (np. 150m)" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+              <button onclick="placeCustomBid(${item.id})" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition cursor-pointer">
+                Licytuj
+              </button>
+            </div>
+          `;
+        } else {
+          priceDisplayHtml = `
+            <div class="flex justify-between items-end mb-3">
+              <div>
+                <span class="text-xs text-slate-400 block">Aktualna oferta (${item.bidsCount || 0}):</span>
+                <span class="text-2xl font-extrabold text-amber-400">${formatPrice(item.currentBid, item.currency)}</span>
+                <span class="text-xs text-slate-500 block">Licytuje: <strong class="text-slate-300">${item.lastBidder}</strong></span>
+              </div>
+              <div class="text-right">
+                <span class="text-xs text-slate-400 block">Kup Teraz:</span>
+                <span class="text-lg font-bold text-emerald-400">${formatPrice(item.buyNow, item.currency)}</span>
+              </div>
+            </div>
+          `;
+          actionButtonsHtml = `
+            <div class="space-y-2">
+              <div class="flex gap-2">
+                <input type="text" id="bid-input-${item.id}" placeholder="Kwota (np. 200 lub 50m)" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+                <button onclick="placeCustomBid(${item.id})" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition cursor-pointer">
+                  Licytuj
+                </button>
+              </div>
+              <button onclick="openBuyModal(${item.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-lg text-sm transition cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-cart-shopping"></i> Kup Teraz / Kontakt
+              </button>
+            </div>
+          `;
+        }
 
         return `
           <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-amber-500/50 transition shadow-lg">
@@ -590,38 +753,13 @@
 
               <h3 class="text-lg font-bold text-white mb-1">${item.title}</h3>
               <p class="text-sm text-slate-400 mb-2">${cleanDesc}</p>
+              ${profileLinkBtn}
               ${middlemanBadge}
             </div>
 
             <div class="border-t border-slate-800 pt-4 mt-4">
-              <div class="flex justify-between items-end mb-3">
-                <div>
-                  <span class="text-xs text-slate-400 block">Aktualna oferta (${item.bidsCount || 0}):</span>
-                  <span class="text-2xl font-extrabold text-amber-400">${item.currentBid} ${item.currency}</span>
-                  <span class="text-xs text-slate-500 block">Licytuje: <strong class="text-slate-300">${item.lastBidder}</strong></span>
-                </div>
-                <div class="text-right">
-                  <span class="text-xs text-slate-400 block">Kup Teraz:</span>
-                  <span class="text-lg font-bold text-emerald-400">${item.buyNow} ${item.currency}</span>
-                </div>
-              </div>
-
-              <!-- Dowolna licytacja kwotowa + Kup Teraz -->
-              <div class="space-y-2">
-                <div class="flex gap-2">
-                  <div class="relative flex-1">
-                    <input type="number" step="any" id="bid-input-${item.id}" placeholder="Min. ${suggestedMinBid}" class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-3 pr-10 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
-                    <span class="absolute right-2.5 top-2 text-xs text-slate-400 font-bold">${item.currency}</span>
-                  </div>
-                  <button onclick="placeCustomBid(${item.id})" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition cursor-pointer whitespace-nowrap">
-                    Licytuj
-                  </button>
-                </div>
-
-                <button onclick="openBuyModal(${item.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-lg text-sm transition cursor-pointer flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-cart-shopping"></i> Kup Teraz / Kontakt ze sprzedawcą
-                </button>
-              </div>
+              ${priceDisplayHtml}
+              ${actionButtonsHtml}
 
               <div class="mt-3 text-xs text-slate-500 flex justify-between items-center">
                 <span>Sprzedaje: <strong class="text-slate-300">${item.seller}</strong> ${deleteBtn}</span>
@@ -634,7 +772,7 @@
     }
 
     // ==========================================
-    // 5. DOWOLNA LICYTACJA KWOTOWA
+    // 6. DOWOLNA LICYTACJA Z PRZELICZNIKIEM (k / m / g)
     // ==========================================
     async function placeCustomBid(id) {
       if (!currentUser) {
@@ -644,16 +782,17 @@
       const item = auctions.find(a => a.id === id);
       if (!item) return;
 
-      const inputEl = document.getElementById(`bid-input-${id}`);
-      const customAmount = Number(inputEl.value);
+      const { meta } = parseAuctionMeta(item);
+      const rawVal = document.getElementById(`bid-input-${id}`).value;
+      const customAmount = parseAmountInput(rawVal, item.currency);
 
       if (!customAmount || customAmount <= Number(item.currentBid)) {
-        alert(`Twoja oferta musi być wyższa niż aktualna kwota (${item.currentBid} ${item.currency})!`);
+        alert(`Twoja oferta musi być wyższa niż aktualna kwota (${formatPrice(item.currentBid, item.currency)})!`);
         return;
       }
 
-      if (customAmount >= Number(item.buyNow)) {
-        if (confirm(`Wpisana kwota (${customAmount} ${item.currency}) osiąga lub przekracza cenę Kup Teraz (${item.buyNow} ${item.currency}). Przejść od razu do zakupu?`)) {
+      if (meta.saleType !== 'auction' && item.buyNow > 0 && customAmount >= Number(item.buyNow)) {
+        if (confirm(`Wpisana kwota (${formatPrice(customAmount, item.currency)}) osiąga lub przekracza cenę Kup Teraz (${formatPrice(item.buyNow, item.currency)}). Przejść od razu do zakupu?`)) {
           openBuyModal(id);
         }
         return;
@@ -673,12 +812,12 @@
         return;
       }
 
-      sendDiscordWebhook(`🔨 **Nowa oferta!** Gracz **${currentUser.username}** (@${currentUser.tag}) zalicytował **${customAmount} ${item.currency}** za **${item.title}** (Świat: ${item.world})!`);
+      sendDiscordWebhook(`🔨 **Nowa oferta!** Gracz **${currentUser.username}** (@${currentUser.tag}) zalicytował **${formatPrice(customAmount, item.currency)}** za **${item.title}** (Świat: ${item.world})!`);
       await fetchAuctions();
     }
 
     // ==========================================
-    // 6. OKNO KUP TERAZ, DANE SPRZEDAWCY I ZAUFANY HANDLARZ
+    // 7. KUP TERAZ I AUTOMATYCZNY KANAŁ NA DISCORDZIE
     // ==========================================
     function openBuyModal(id) {
       if (!currentUser) {
@@ -689,11 +828,10 @@
       if (!item) return;
 
       const { meta } = parseAuctionMeta(item);
-      const middlemanName = localStorage.getItem('margo_middleman_tag') || DEFAULT_MIDDLEMAN;
 
       const discordProfileBtn = meta.discordId
         ? `<a href="discord://-/users/${meta.discordId}" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-2 transition">
-             <i class="fa-brands fa-discord"></i> Otwórz czat ze sprzedawcą w aplikacji Discord
+             <i class="fa-brands fa-discord"></i> Napisz do sprzedawcy na Discordzie
            </a>`
         : '';
 
@@ -702,10 +840,9 @@
         <div class="bg-slate-950 border border-slate-800 rounded-lg p-3">
           <div class="text-xs text-slate-400">Kupujesz ofertę (Świat: ${item.world}):</div>
           <div class="font-bold text-white text-base">${item.title}</div>
-          <div class="text-emerald-400 font-extrabold text-lg mt-1">Cena Kup Teraz: ${item.buyNow} ${item.currency}</div>
+          <div class="text-emerald-400 font-extrabold text-lg mt-1">Cena Kup Teraz: ${formatPrice(item.buyNow, item.currency)}</div>
         </div>
 
-        <!-- Wizytówka Discord sprzedawcy -->
         <div class="bg-slate-950 border border-[#5865F2]/40 rounded-lg p-3.5 space-y-2.5">
           <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1.5">
             <i class="fa-brands fa-discord text-[#5865F2]"></i> Dane kontaktowe sprzedawcy:
@@ -713,7 +850,7 @@
           <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded border border-slate-800">
             <div>
               <div class="text-sm font-bold text-white">${item.seller}</div>
-              <div class="text-xs text-amber-400 font-mono" id="seller-tag-copy">@${meta.discordTag}</div>
+              <div class="text-xs text-amber-400 font-mono">@${meta.discordTag}</div>
             </div>
             <button onclick="navigator.clipboard.writeText('${meta.discordTag}'); alert('Skopiowano nick Discord: ${meta.discordTag}');" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded border border-slate-700 cursor-pointer flex items-center gap-1">
               <i class="fa-regular fa-copy"></i> Kopiuj nick
@@ -722,20 +859,19 @@
           ${discordProfileBtn}
         </div>
 
-        <!-- Opcja wymiany przez Zaufanego Handlarza -->
         <div class="bg-indigo-950/40 border border-indigo-700/50 rounded-lg p-3.5 space-y-2">
           <label class="flex items-start gap-2.5 cursor-pointer">
             <input type="checkbox" id="use-middleman-checkbox" ${meta.middleman ? 'checked' : ''} class="w-4 h-4 mt-0.5 accent-amber-500 rounded">
             <div class="text-xs">
-              <span class="font-bold text-indigo-300 block">Wymiana przez Zaufanego Handlarza (Middleman)</span>
-              <span class="text-slate-400">Automatycznie wyśle prośbę na serwer Discord o utworzenie wspólnego kanału/ticketu dla Ciebie, sprzedającego (<strong>@${meta.discordTag}</strong>) oraz handlarza (<strong>${middlemanName}</strong>).</span>
+              <span class="font-bold text-indigo-300 block">Chcę wymianę przez Zaufanego Handlarza (Utwórz kanał)</span>
+              <span class="text-slate-400">Bot na Discordzie automatycznie stworzy prywatny kanał tekstowy tylko dla Ciebie, sprzedającego (<strong>@${meta.discordTag}</strong>) oraz Zaufanego Handlarza.</span>
             </div>
           </label>
         </div>
 
         <div class="flex gap-2 pt-2">
           <button onclick="confirmPurchase(${item.id})" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-sm transition cursor-pointer">
-            Potwierdzam zakup (+ Wyślij Ticket)
+            Potwierdzam zakup
           </button>
           <button onclick="closeBuyModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-lg text-sm transition cursor-pointer">
             Anuluj
@@ -758,26 +894,35 @@
 
       const { meta } = parseAuctionMeta(item);
       const useMiddleman = document.getElementById('use-middleman-checkbox').checked;
-      const middlemanName = localStorage.getItem('margo_middleman_tag') || DEFAULT_MIDDLEMAN;
-
-      const buyerMention = currentUser.id ? `<@${currentUser.id}> (@${currentUser.tag})` : `**${currentUser.username}** (@${currentUser.tag})`;
-      const sellerMention = meta.discordId ? `<@${meta.discordId}> (@${meta.discordTag})` : `**${item.seller}** (@${meta.discordTag})`;
+      const middlemanId = localStorage.getItem('margo_middleman_id') || "";
+      const formattedPrice = formatPrice(item.buyNow, item.currency);
 
       if (useMiddleman) {
+        // Specjalny znacznik !ticket dla bota w Pythonie, który automatycznie otworzy prywatny kanał
+        const ticketPayload = {
+          buyerId: currentUser.id || "",
+          buyerTag: currentUser.tag,
+          sellerId: meta.discordId || "",
+          sellerTag: meta.discordTag,
+          middlemanId: middlemanId,
+          title: item.title,
+          world: item.world,
+          price: formattedPrice
+        };
+
         sendDiscordWebhook(
+          `!ticket ${JSON.stringify(ticketPayload)}\n` +
           `🛡️ **NOWY TICKET HANDLOWY (ZAUFANY HANDLARZ)** 🛡️\n` +
-          `📦 Przedmiot: **${item.title}** (Świat: **${item.world}**)\n` +
-          `💰 Kwota: **${item.buyNow} ${item.currency}**\n` +
-          `👤 Kupujący: ${buyerMention}\n` +
-          `👤 Sprzedający: ${sellerMention}\n` +
-          `🤝 Zaufany Handlarz: **${middlemanName}**\n` +
-          `👉 *Proszę o utworzenie prywatnego kanału/wątku dla powyższej trójki w celu przeprowadzenia bezpiecznej wymiany!*`
+          `📦 Przedmiot: **${item.title}** (${item.world}) | Kwota: **${formattedPrice}**\n` +
+          `👤 Kupujący: <@${currentUser.id}> (@${currentUser.tag})\n` +
+          `👤 Sprzedający: ${meta.discordId ? `<@${meta.discordId}>` : ''} (@${meta.discordTag})\n` +
+          `🤝 Handlarz: ${middlemanId ? `<@${middlemanId}>` : 'Administrator'}`
         );
       } else {
         sendDiscordWebhook(
           `✅ **SPRZEDANE (KUP TERAZ)!**\n` +
-          `📦 **${item.title}** (${item.world}) za **${item.buyNow} ${item.currency}**\n` +
-          `👤 Kupił: ${buyerMention} od ${sellerMention}`
+          `📦 **${item.title}** (${item.world}) za **${formattedPrice}**\n` +
+          `👤 Kupił: **${currentUser.username}** (@${currentUser.tag}) od **${item.seller}** (@${meta.discordTag})`
         );
       }
 
@@ -788,11 +933,10 @@
       }
 
       closeBuyModal();
-      alert(`Zakup potwierdzony! Skontaktuj się ze sprzedawcą (@${meta.discordTag}) na Discordzie${useMiddleman ? ' lub poczekaj na otwarcie kanału z Zaufanym Handlarzem.' : '.'}`);
+      alert(`Zakup potwierdzony! ${useMiddleman ? 'Bot na Discordzie właśnie tworzy dla Was prywatny kanał handlowy.' : `Skontaktuj się ze sprzedawcą (@${meta.discordTag}) na Discordzie.`}`);
       await fetchAuctions();
     }
 
-    // Usuwanie własnej aukcji
     async function deleteAuction(id) {
       if (!confirm("Czy na pewno chcesz usunąć swoją aukcję?")) return;
       const { error } = await supabaseClient.from('auctions').delete().eq('id', id);
@@ -800,16 +944,40 @@
     }
 
     // ==========================================
-    // 7. DODAWANIE NOWEJ AUKCJI (WIELE ZDJĘĆ, LVL, WALUTY)
+    // 8. DODAWANIE OFERTY
     // ==========================================
     async function addAuction(e) {
       e.preventDefault();
-      const price = Number(document.getElementById('item-price').value);
-      const buyNow = Number(document.getElementById('item-buynow').value);
+      const saleType = document.getElementById('item-sale-type').value;
+      const curr = document.getElementById('item-currency').value;
 
-      if (buyNow <= price) {
-        alert("Cena Kup Teraz musi być wyższa niż cena wywoławcza!");
-        return;
+      const rawPrice = document.getElementById('item-price').value;
+      const rawBuyNow = document.getElementById('item-buynow').value;
+
+      let price = saleType === 'buynow' ? 0 : parseAmountInput(rawPrice, curr);
+      let buyNow = saleType === 'auction' ? 0 : parseAmountInput(rawBuyNow, curr);
+
+      if (saleType === 'both') {
+        if (price <= 0 || buyNow <= 0) {
+          alert("Podaj prawidłową cenę wywoławczą oraz cenę Kup Teraz!");
+          return;
+        }
+        if (buyNow <= price) {
+          alert("Cena Kup Teraz musi być wyższa niż cena wywoławcza!");
+          return;
+        }
+      } else if (saleType === 'buynow') {
+        if (buyNow <= 0) {
+          alert("Podaj prawidłową cenę Kup Teraz!");
+          return;
+        }
+        price = buyNow;
+      } else if (saleType === 'auction') {
+        if (price <= 0) {
+          alert("Podaj prawidłową cenę wywoławczą!");
+          return;
+        }
+        buyNow = price * 999999;
       }
 
       const btn = document.getElementById('submit-btn');
@@ -822,13 +990,15 @@
       const lvlVal = Number(document.getElementById('item-lvl').value) || null;
       const cleanDesc = document.getElementById('item-desc').value.trim() || "Brak dodatkowego opisu.";
       const allowMiddleman = document.getElementById('item-middleman').checked;
+      const profileUrl = document.getElementById('item-profile-url').value.trim();
 
-      // Pakujemy metadane (LVL, Discord Tag, Discord ID, Middleman), by nie trzeba było zmieniać struktury bazy
       const metaObj = {
         lvl: lvlVal,
         discordTag: currentUser.tag,
         discordId: currentUser.id,
-        middleman: allowMiddleman
+        middleman: allowMiddleman,
+        saleType: saleType,
+        profileUrl: profileUrl
       };
 
       const packedDescription = `${cleanDesc}|||META:${JSON.stringify(metaObj)}`;
@@ -837,7 +1007,7 @@
         title: document.getElementById('item-title').value,
         category: document.getElementById('item-category').value,
         world: document.getElementById('item-world').value,
-        currency: document.getElementById('item-currency').value,
+        currency: curr,
         currentBid: price,
         buyNow: buyNow,
         img: JSON.stringify(imgList),
@@ -859,14 +1029,16 @@
 
       closeAddModal();
       e.target.reset();
+      toggleAccountLinkField();
+      toggleSaleTypeFields();
       await fetchAuctions();
 
       sendDiscordWebhook(
-        `📢 **Nowa aukcja na Margoplaats!**\n` +
-        `📦 **${newAuction.title}** ${lvlVal ? `(LVL ${lvlVal})` : ''} | Kategoria: **${newAuction.category}** | Świat: **${newAuction.world}**\n` +
-        `💰 Wywoławcza: **${newAuction.currentBid} ${newAuction.currency}** | Kup Teraz: **${newAuction.buyNow} ${newAuction.currency}**\n` +
+        `📢 **Nowa oferta na Margoplaats!**\n` +
+        `📦 **${newAuction.title}** ${lvlVal ? `(LVL ${lvlVal})` : ''} | **${newAuction.category}** | Świat: **${newAuction.world}**\n` +
+        `💰 ${saleType === 'buynow' ? `Kup Teraz: **${formatPrice(buyNow, curr)}**` : `Wywoławcza: **${formatPrice(price, curr)}**`}\n` +
         `👤 Wystawił: **${currentUser.username}** (@${currentUser.tag})\n` +
-        `🔗 Link: ${REDIRECT_URI}`
+        `🔗 ${REDIRECT_URI}`
       );
     }
 
@@ -886,7 +1058,7 @@
 
     function openWebhookModal() {
       document.getElementById('webhook-url-input').value = localStorage.getItem('margo_webhook_url') || '';
-      document.getElementById('middleman-tag-input').value = localStorage.getItem('margo_middleman_tag') || DEFAULT_MIDDLEMAN;
+      document.getElementById('middleman-id-input').value = localStorage.getItem('margo_middleman_id') || '';
       document.getElementById('webhook-modal').classList.remove('hidden');
       document.getElementById('webhook-modal').classList.add('flex');
     }
@@ -898,13 +1070,13 @@
 
     function saveWebhook() {
       const url = document.getElementById('webhook-url-input').value.trim();
-      const middleman = document.getElementById('middleman-tag-input').value.trim() || DEFAULT_MIDDLEMAN;
+      const middlemanId = document.getElementById('middleman-id-input').value.trim();
       localStorage.setItem('margo_webhook_url', url);
-      localStorage.setItem('margo_middleman_tag', middleman);
+      localStorage.setItem('margo_middleman_id', middlemanId);
       closeWebhookModal();
       if (url) {
-        sendDiscordWebhook(`✅ **System Margoplaats połączony!** Aktualny Zaufany Handlarz: **${middleman}**`);
-        alert("Zapisano ustawienia Webhooka i Zaufanego Handlarza!");
+        sendDiscordWebhook(`✅ **System Margoplaats połączony z Discordem!**`);
+        alert("Zapisano ustawienia Webhooka i ID Handlarza!");
       }
     }
 
