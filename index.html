@@ -7,27 +7,27 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
 
   <!-- Pasek nawigacji -->
-  <nav class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-40">
+  <nav class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-3">
         <div class="bg-amber-500/20 border border-amber-500/50 p-2 rounded-lg text-amber-400">
           <i class="fa-solid fa-gavel text-xl"></i>
         </div>
         <div>
-          <span class="text-xl font-bold tracking-wider bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">MARGOPLAATS</span>
-          <span class="hidden sm:inline-block ml-2 text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Giełda PLN</span>
+          <span class="text-xl font-extrabold tracking-wider bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">MARGOPLAATS</span>
+          <span class="hidden sm:inline-block ml-2 text-xs bg-slate-800 border border-slate-700 text-slate-300 px-2 py-0.5 rounded">Giełda PLN & Złoto</span>
         </div>
       </div>
 
-      <!-- Sekcja użytkownika / Logowanie Discord -->
-      <div id="auth-section">
-        <button onclick="loginWithDiscord()" class="bg-[#5865F2] hover:bg-[#4752C4] text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition shadow-lg shadow-[#5865F2]/25 cursor-pointer">
-          <i class="fa-brands fa-discord"></i>
-          <span>Zaloguj przez Discord</span>
+      <div class="flex items-center gap-3">
+        <button onclick="openWebhookModal()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-2 rounded-lg transition cursor-pointer flex items-center gap-1.5" title="Podłącz powiadomienia na serwer Discord">
+          <i class="fa-solid fa-bell text-amber-400"></i>
+          <span class="hidden md:inline">Webhook Discord</span>
         </button>
+        <div id="auth-section"></div>
       </div>
     </div>
   </nav>
@@ -35,44 +35,81 @@
   <!-- Główna zawartość -->
   <main class="max-w-6xl mx-auto px-4 py-8">
     
-    <!-- Nagłówek i filtry -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700/80">
-      <div class="flex flex-wrap gap-3 w-full md:w-auto">
-        <select id="filter-world" onchange="renderAuctions()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
-          <option value="all">Wszystkie światy</option>
-          <option value="Katahha">Katahha</option>
-          <option value="Tarhuna">Tarhuna</option>
-          <option value="Aldous">Aldous</option>
-          <option value="Tempest">Tempest</option>
-          <option value="Zorza">Zorza</option>
-        </select>
-
-        <select id="filter-category" onchange="renderAuctions()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
-          <option value="all">Wszystkie kategorie</option>
-          <option value="Legenda">Przedmiot: Legenda</option>
-          <option value="Konto">Konto / Postać</option>
-          <option value="Złoto">Złoto (m/g)</option>
-        </select>
+    <!-- Pasek Kategorii (Zakładki) i Filtr Światów -->
+    <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center mb-6 gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-lg">
+      
+      <!-- Zakładki kategorii -->
+      <div class="flex flex-wrap gap-2" id="category-tabs">
+        <button onclick="setCategory('all')" data-cat="all" class="cat-btn bg-amber-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2">
+          <i class="fa-solid fa-layer-group"></i> Wszystkie
+        </button>
+        <button onclick="setCategory('Przedmioty')" data-cat="Przedmioty" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-amber-400"></i> Przedmioty
+        </button>
+        <button onclick="setCategory('Konta')" data-cat="Konta" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2">
+          <i class="fa-solid fa-user-ninja text-purple-400"></i> Konta
+        </button>
+        <button onclick="setCategory('Złoto')" data-cat="Złoto" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2">
+          <i class="fa-solid fa-coins text-yellow-400"></i> Złoto
+        </button>
       </div>
 
-      <button onclick="openAddModal()" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2 rounded-lg transition flex items-center justify-center space-x-2 cursor-pointer shadow-lg shadow-amber-500/20">
-        <i class="fa-solid fa-plus"></i>
-        <span>Wystaw aukcję</span>
-      </button>
+      <!-- Filtry prawej strony + Wystawianie -->
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Wybór świata -->
+        <div class="relative flex-1 sm:flex-initial">
+          <select id="filter-world" onchange="renderAuctions()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+            <option value="all">🌍 Wszystkie światy</option>
+            <optgroup label="Światy Zwykłe">
+              <option value="Katahha">Katahha</option>
+              <option value="Tarhuna">Tarhuna</option>
+              <option value="Aldous">Aldous</option>
+              <option value="Gefion">Gefion</option>
+              <option value="Hutena">Hutena</option>
+              <option value="Jaruna">Jaruna</option>
+              <option value="Lelwani">Lelwani</option>
+              <option value="Majuna">Majuna</option>
+              <option value="Nomada">Nomada</option>
+              <option value="Perkun">Perkun</option>
+              <option value="Telawel">Telawel</option>
+              <option value="Tempest">Tempest</option>
+              <option value="Zemyna">Zemyna</option>
+              <option value="Zorza">Zorza</option>
+            </optgroup>
+            <optgroup label="Światy Prywatne / Inne">
+              <option value="Nubes">Nubes</option>
+              <option value="Thantos">Thantos</option>
+              <option value="Syberia">Syberia</option>
+              <option value="Unia">Unia</option>
+              <option value="Pandora">Pandora</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Wybór waluty -->
+        <select id="filter-currency" onchange="renderAuctions()" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+          <option value="all">💰 PLN i Złoto</option>
+          <option value="PLN">Tylko PLN (zł)</option>
+          <option value="m">Tylko Złoto (m)</option>
+        </select>
+
+        <button onclick="openAddModal()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2 rounded-lg transition flex items-center justify-center space-x-2 cursor-pointer shadow-lg shadow-amber-500/20">
+          <i class="fa-solid fa-plus"></i>
+          <span>Wystaw ofertę</span>
+        </button>
+      </div>
     </div>
 
     <!-- Lista aukcji -->
-    <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Generowane przez JS -->
-    </div>
+    <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
   </main>
 
   <!-- Modal dodawania aukcji -->
-  <div id="add-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
+  <div id="add-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-amber-400">Wystaw na sprzedaż</h3>
+        <h3 class="text-xl font-bold text-amber-400">Wystaw na giełdę</h3>
         <button onclick="closeAddModal()" class="text-slate-400 hover:text-white cursor-pointer">
           <i class="fa-solid fa-xmark text-xl"></i>
         </button>
@@ -80,126 +117,188 @@
 
       <form onsubmit="addAuction(event)" class="space-y-4">
         <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Nazwa przedmiotu / konta</label>
-          <input type="text" id="item-title" required placeholder="np. Pierścień Mocy 120 lvl" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Tytuł oferty</label>
+          <input type="text" id="item-title" required placeholder="np. Pierścień Mocy 120 lvl / Tancerz 215 lvl" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Kategoria</label>
-            <select id="item-category" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
-              <option value="Legenda">Legenda</option>
-              <option value="Konto">Konto</option>
-              <option value="Złoto">Złoto</option>
+            <select id="item-category" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+              <option value="Przedmioty">Przedmioty (Leg/Hero)</option>
+              <option value="Konta">Konto / Postać</option>
+              <option value="Złoto">Złoto (m/g)</option>
             </select>
           </div>
           <div>
             <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Świat</label>
-            <select id="item-world" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+            <select id="item-world" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
               <option value="Katahha">Katahha</option>
               <option value="Tarhuna">Tarhuna</option>
               <option value="Aldous">Aldous</option>
+              <option value="Gefion">Gefion</option>
+              <option value="Hutena">Hutena</option>
+              <option value="Jaruna">Jaruna</option>
+              <option value="Lelwani">Lelwani</option>
+              <option value="Majuna">Majuna</option>
+              <option value="Nomada">Nomada</option>
+              <option value="Perkun">Perkun</option>
+              <option value="Telawel">Telawel</option>
               <option value="Tempest">Tempest</option>
+              <option value="Zemyna">Zemyna</option>
               <option value="Zorza">Zorza</option>
+              <option value="Pandora">Pandora</option>
+              <option value="Unia">Unia</option>
             </select>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-3 gap-3">
           <div>
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Cena wywoławcza (PLN)</label>
-            <input type="number" id="item-price" required min="1" placeholder="50" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Waluta</label>
+            <select id="item-currency" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-400 font-bold focus:outline-none focus:border-amber-500">
+              <option value="PLN">PLN (zł)</option>
+              <option value="m">Złoto (m)</option>
+            </select>
           </div>
           <div>
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Kup Teraz (PLN)</label>
-            <input type="number" id="item-buynow" required min="1" placeholder="120" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Wywoławcza</label>
+            <input type="number" id="item-price" required min="1" placeholder="50" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Kup Teraz</label>
+            <input type="number" id="item-buynow" required min="1" placeholder="120" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Krótki opis / Wymagania</label>
-          <textarea id="item-desc" rows="2" placeholder="np. Czysty, bez przypisania, płatność BLIK." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"></textarea>
+          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Link do screena (opcjonalnie)</label>
+          <input type="url" id="item-img" placeholder="https://i.imgur.com/twoj-screen.png" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+        </div>
+
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Opis / Kontakt / Płatność</label>
+          <textarea id="item-desc" rows="2" placeholder="np. Nieprzypisany, płatność BLIK lub wymiana w Ithan." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500"></textarea>
         </div>
 
         <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg transition cursor-pointer">
-          Opublikuj ofertę
+          Wystaw ofertę
         </button>
       </form>
     </div>
   </div>
 
+  <!-- Modal konfiguracji Webhooka Discord -->
+  <div id="webhook-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-brands fa-discord text-[#5865F2]"></i> Powiadomienia na Discordzie
+        </h3>
+        <button onclick="closeWebhookModal()" class="text-slate-400 hover:text-white cursor-pointer">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">
+        Wklej tutaj adres <strong>Webhook URL</strong> ze swojego kanału na Discordzie (Edytuj kanał → Integracje → Webhooki). Każda nowa aukcja i przebicie wyśle powiadomienie na Twój serwer!
+      </p>
+      <input type="url" id="webhook-url-input" placeholder="https://discord.com/api/webhooks/..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm mb-4 focus:outline-none focus:border-amber-500">
+      <div class="flex gap-2">
+        <button onclick="saveWebhook()" class="flex-1 bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2 rounded-lg text-sm transition cursor-pointer">
+          Zapisz Webhook
+        </button>
+        <button onclick="closeWebhookModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm transition cursor-pointer">
+          Zamknij
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // ==========================================
-    // KONFIGURACJA DISCORD OAUTH2 (Margoplaats)
-    // ==========================================
     const DISCORD_CLIENT_ID = "1570417107181772890";
     const REDIRECT_URI = "https://wujakamil.github.io/Margoplaats/";
 
     let currentUser = JSON.parse(localStorage.getItem('margo_discord_user')) || null;
+    let activeCategory = 'all';
 
-    // Przykładowe aukcje na start
     const defaultAuctions = [
       {
-        id: 1,
-        title: "Pierścień Mocy (120 lvl)",
-        category: "Legenda",
+        id: 101,
+        title: "Pierścień Mocy (120 lvl) - Legenda",
+        category: "Przedmioty",
         world: "Katahha",
-        currentBid: 85,
+        currency: "PLN",
+        currentBid: 90,
         buyNow: 150,
-        desc: "Legendarny pierścień, nieprzypisany. Szybka wymiana w Ithan.",
-        seller: "Kamil#0001",
+        img: "",
+        desc: "Czysty, nieprzypisany. Szybka wymiana w Ithan, płatność BLIK.",
+        seller: "Wuja Kamil",
         lastBidder: "Brak ofert",
         bidsCount: 0
       },
       {
-        id: 2,
+        id: 102,
         title: "Wojownik 215 lvl + EQ Heroik/Leg",
-        category: "Konto",
+        category: "Konta",
         world: "Katahha",
-        currentBid: 220,
+        currency: "PLN",
+        currentBid: 240,
         buyNow: 400,
-        desc: "Konto bez wyrobionego klucza odzyskiwania, pełny dostęp.",
+        img: "",
+        desc: "Konto bez wyrobionego klucza odzyskiwania, pełny dostęp z e-mailem.",
         seller: "HandlarzKatahha",
         lastBidder: "ZosiaSamosia",
         bidsCount: 3
       },
       {
-        id: 3,
-        title: "Pakiet 500m złota",
+        id: 103,
+        title: "Pakiet 1g (1000m) Złota",
         category: "Złoto",
         world: "Tarhuna",
-        currentBid: 40,
-        buyNow: 65,
-        desc: "Przekazanie przez bezpieczną aukcję w grze.",
+        currency: "PLN",
+        currentBid: 75,
+        buyNow: 110,
+        img: "",
+        desc: "Przekazanie przez bezpieczną aukcję w grze. Dostępne od ręki.",
         seller: "GoldFarmer",
         lastBidder: "Brak ofert",
         bidsCount: 0
+      },
+      {
+        id: 104,
+        title: "Zbroja Pradawnych (150 lvl)",
+        category: "Przedmioty",
+        world: "Katahha",
+        currency: "m",
+        currentBid: 850,
+        buyNow: 1400,
+        img: "",
+        desc: "Sprzedam za złoto bezpośrednio na świecie Katahha.",
+        seller: "Anna",
+        lastBidder: "Kitiket",
+        bidsCount: 2
       }
     ];
 
-    let auctions = JSON.parse(localStorage.getItem('margoplaats_auctions')) || defaultAuctions;
+    let auctions = JSON.parse(localStorage.getItem('margoplaats_auctions_v2')) || defaultAuctions;
 
-    // Funkcja przekierowująca do logowania Discord
     function loginWithDiscord() {
       const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
       window.location.href = authUrl;
     }
 
-    // Wylogowanie
     function logout() {
       localStorage.removeItem('margo_discord_user');
       currentUser = null;
       renderAuthSection();
     }
 
-    // Odbieranie tokenu z paska adresu po powrocie z Discorda
     async function checkDiscordCallback() {
       if (window.location.hash.includes('access_token')) {
         const fragment = new URLSearchParams(window.location.hash.slice(1));
         const accessToken = fragment.get('access_token');
         const tokenType = fragment.get('token_type');
 
-        // Czyszczenie adresu URL z tokenu
         window.history.replaceState({}, document.title, window.location.pathname);
 
         try {
@@ -230,12 +329,11 @@
       renderAuctions();
     }
 
-    // Aktualizacja paska nawigacji (Zalogowany / Niezalogowany)
     function renderAuthSection() {
       const container = document.getElementById('auth-section');
       if (currentUser) {
         container.innerHTML = `
-          <div class="flex items-center space-x-3 bg-slate-900/90 border border-slate-700 px-3 py-1.5 rounded-lg">
+          <div class="flex items-center space-x-3 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg">
             <img src="${currentUser.avatar}" alt="Avatar" class="w-8 h-8 rounded-full border border-emerald-500">
             <div class="text-sm">
               <div class="font-bold text-white leading-tight flex items-center gap-1">
@@ -251,7 +349,7 @@
         `;
       } else {
         container.innerHTML = `
-          <button onclick="loginWithDiscord()" class="bg-[#5865F2] hover:bg-[#4752C4] text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition shadow-lg shadow-[#5865F2]/25 cursor-pointer">
+          <button onclick="loginWithDiscord()" class="bg-[#5865F2] hover:bg-[#4752C4] text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition shadow-lg shadow-[#5865F2]/25 cursor-pointer text-sm">
             <i class="fa-brands fa-discord"></i>
             <span>Zaloguj przez Discord</span>
           </button>
@@ -259,66 +357,90 @@
       }
     }
 
-    // Wyświetlanie kart aukcji
+    // Zmiana zakładki kategorii
+    function setCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.className = "cat-btn bg-amber-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2";
+        } else {
+          btn.className = "cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2";
+        }
+      });
+      renderAuctions();
+    }
+
     function renderAuctions() {
       const grid = document.getElementById('auctions-grid');
       const worldFilter = document.getElementById('filter-world').value;
-      const catFilter = document.getElementById('filter-category').value;
+      const currencyFilter = document.getElementById('filter-currency').value;
 
       const filtered = auctions.filter(a => {
         const matchWorld = worldFilter === 'all' || a.world === worldFilter;
-        const matchCat = catFilter === 'all' || a.category === catFilter;
-        return matchWorld && matchCat;
+        const matchCat = activeCategory === 'all' || a.category === activeCategory;
+        const matchCurr = currencyFilter === 'all' || a.currency === currencyFilter;
+        return matchWorld && matchCat && matchCurr;
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">Brak ofert spełniających kryteria.</div>`;
+        grid.innerHTML = `
+          <div class="col-span-full bg-slate-900/50 border border-slate-800 rounded-xl text-center py-12 text-slate-400">
+            <i class="fa-solid fa-box-open text-3xl mb-2 text-slate-600 block"></i>
+            Brak aktywnych ofert dla wybranych filtrów.
+          </div>`;
         return;
       }
 
       grid.innerHTML = filtered.map(item => {
         let badgeColor = "bg-amber-500/20 text-amber-400 border-amber-500/40";
-        let icon = "fa-ring";
-        if (item.category === "Konto") {
+        let icon = "fa-shield-halved";
+        if (item.category === "Konta") {
           badgeColor = "bg-purple-500/20 text-purple-400 border-purple-500/40";
-          icon = "fa-user-shield";
+          icon = "fa-user-ninja";
         } else if (item.category === "Złoto") {
           badgeColor = "bg-yellow-500/20 text-yellow-300 border-yellow-500/40";
           icon = "fa-coins";
         }
 
+        const step = item.currency === 'PLN' ? 10 : 50;
+        const imgSection = item.img
+          ? `<img src="${item.img}" alt="${item.title}" class="w-full h-36 object-cover rounded-lg mb-3 border border-slate-700">`
+          : '';
+
         return `
-          <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between hover:border-amber-500/50 transition shadow-lg">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-amber-500/50 transition shadow-lg">
             <div>
               <div class="flex justify-between items-start mb-3">
                 <span class="text-xs font-semibold px-2.5 py-1 rounded border ${badgeColor} flex items-center gap-1.5">
                   <i class="fa-solid ${icon}"></i> ${item.category}
                 </span>
-                <span class="text-xs bg-slate-900 text-slate-300 px-2.5 py-1 rounded border border-slate-700 font-medium">
-                  Świat: ${item.world}
+                <span class="text-xs bg-slate-950 text-slate-300 px-2.5 py-1 rounded border border-slate-800 font-medium">
+                  🌍 ${item.world}
                 </span>
               </div>
 
-              <h3 class="text-lg font-bold text-white mb-2">${item.title}</h3>
+              ${imgSection}
+
+              <h3 class="text-lg font-bold text-white mb-1.5">${item.title}</h3>
               <p class="text-sm text-slate-400 mb-4">${item.desc}</p>
             </div>
 
-            <div class="border-t border-slate-700/80 pt-4 mt-2">
+            <div class="border-t border-slate-800 pt-4 mt-2">
               <div class="flex justify-between items-end mb-3">
                 <div>
                   <span class="text-xs text-slate-400 block">Aktualna oferta (${item.bidsCount}):</span>
-                  <span class="text-2xl font-extrabold text-amber-400">${item.currentBid} PLN</span>
-                  <span class="text-xs text-slate-500 block">Licytuje: ${item.lastBidder}</span>
+                  <span class="text-2xl font-extrabold text-amber-400">${item.currentBid} ${item.currency}</span>
+                  <span class="text-xs text-slate-500 block">Licytuje: <strong class="text-slate-300">${item.lastBidder}</strong></span>
                 </div>
                 <div class="text-right">
                   <span class="text-xs text-slate-400 block">Kup Teraz:</span>
-                  <span class="text-lg font-bold text-emerald-400">${item.buyNow} PLN</span>
+                  <span class="text-lg font-bold text-emerald-400">${item.buyNow} ${item.currency}</span>
                 </div>
               </div>
 
               <div class="flex gap-2">
                 <button onclick="placeBid(${item.id})" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded-lg text-sm transition cursor-pointer">
-                  Podbij (+10 PLN)
+                  Podbij (+${step} ${item.currency})
                 </button>
                 <button onclick="buyNow(${item.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition cursor-pointer">
                   Kup Teraz
@@ -335,41 +457,50 @@
       }).join('');
     }
 
-    // Licytowanie
+    // Licytowanie z blokadą przekroczenia ceny Kup Teraz
     function placeBid(id) {
       if (!currentUser) {
-        alert("Musisz zalogować się przez Discord, aby brać udział w licytacji!");
+        alert("Zaloguj się przez Discord, aby licytować!");
         return;
       }
       const item = auctions.find(a => a.id === id);
-      if (item) {
-        item.currentBid += 10;
-        item.bidsCount += 1;
-        item.lastBidder = currentUser.username;
-        localStorage.setItem('margoplaats_auctions', JSON.stringify(auctions));
-        renderAuctions();
+      if (!item) return;
+
+      const step = item.currency === 'PLN' ? 10 : 50;
+      if (item.currentBid + step >= item.buyNow) {
+        if (confirm(`Twoje przebicie osiągnie lub przekroczy cenę Kup Teraz (${item.buyNow} ${item.currency}). Czy chcesz od razu kupić ten przedmiot?`)) {
+          buyNow(id);
+        }
+        return;
       }
+
+      item.currentBid += step;
+      item.bidsCount += 1;
+      item.lastBidder = currentUser.username;
+      localStorage.setItem('margoplaats_auctions_v2', JSON.stringify(auctions));
+      renderAuctions();
+
+      sendDiscordWebhook(`🔨 **Nowa oferta!** Gracz **${currentUser.username}** podbił cenę za **${item.title}** (${item.world}) do **${item.currentBid} ${item.currency}**!`);
     }
 
-    // Kup Teraz
     function buyNow(id) {
       if (!currentUser) {
-        alert("Musisz zalogować się przez Discord, aby kupić przedmiot!");
+        alert("Zaloguj się przez Discord, aby kupić przedmiot!");
         return;
       }
       const item = auctions.find(a => a.id === id);
-      if (item && confirm(`Czy na pewno chcesz kupić "${item.title}" za ${item.buyNow} PLN?`)) {
-        alert(`Gratulacje ${currentUser.username}! Kupiłeś przedmiot. Skontaktuj się ze sprzedawcą (${item.seller}) na Discordzie.`);
+      if (item && confirm(`Czy na pewno chcesz kupić "${item.title}" za ${item.buyNow} ${item.currency}?`)) {
+        sendDiscordWebhook(`✅ **SPRZEDANE!** Gracz **${currentUser.username}** kupił **${item.title}** (${item.world}) za **${item.buyNow} ${item.currency}** od **${item.seller}**!`);
+        alert(`Gratulacje ${currentUser.username}! Kupiłeś ofertę. Skontaktuj się ze sprzedawcą (${item.seller}) na Discordzie.`);
         auctions = auctions.filter(a => a.id !== id);
-        localStorage.setItem('margoplaats_auctions', JSON.stringify(auctions));
+        localStorage.setItem('margoplaats_auctions_v2', JSON.stringify(auctions));
         renderAuctions();
       }
     }
 
-    // Obsługa modala dodawania
     function openAddModal() {
       if (!currentUser) {
-        alert("Zaloguj się przez Discord, aby wystawić przedmiot!");
+        alert("Zaloguj się przez Discord, aby wystawić ofertę!");
         return;
       }
       document.getElementById('add-modal').classList.remove('hidden');
@@ -383,13 +514,23 @@
 
     function addAuction(e) {
       e.preventDefault();
+      const price = Number(document.getElementById('item-price').value);
+      const buyNow = Number(document.getElementById('item-buynow').value);
+
+      if (buyNow <= price) {
+        alert("Cena Kup Teraz musi być wyższa niż cena wywoławcza!");
+        return;
+      }
+
       const newAuction = {
         id: Date.now(),
         title: document.getElementById('item-title').value,
         category: document.getElementById('item-category').value,
         world: document.getElementById('item-world').value,
-        currentBid: Number(document.getElementById('item-price').value),
-        buyNow: Number(document.getElementById('item-buynow').value),
+        currency: document.getElementById('item-currency').value,
+        currentBid: price,
+        buyNow: buyNow,
+        img: document.getElementById('item-img').value.trim(),
         desc: document.getElementById('item-desc').value || "Brak dodatkowego opisu.",
         seller: currentUser.username,
         lastBidder: "Brak ofert",
@@ -397,10 +538,44 @@
       };
 
       auctions.unshift(newAuction);
-      localStorage.setItem('margoplaats_auctions', JSON.stringify(auctions));
+      localStorage.setItem('margoplaats_auctions_v2', JSON.stringify(auctions));
       closeAddModal();
       e.target.reset();
       renderAuctions();
+
+      sendDiscordWebhook(`📢 **Nowa aukcja na Margoplaats!**\n📦 **${newAuction.title}** (${newAuction.category} | Świat: **${newAuction.world}**)\n💰 Wywoławcza: **${newAuction.currentBid} ${newAuction.currency}** | Kup Teraz: **${newAuction.buyNow} ${newAuction.currency}**\n👤 Wystawił: **${newAuction.seller}**\n🔗 Link: ${REDIRECT_URI}`);
+    }
+
+    // Obsługa Webhooka Discord
+    function openWebhookModal() {
+      document.getElementById('webhook-url-input').value = localStorage.getItem('margo_webhook_url') || '';
+      document.getElementById('webhook-modal').classList.remove('hidden');
+      document.getElementById('webhook-modal').classList.add('flex');
+    }
+
+    function closeWebhookModal() {
+      document.getElementById('webhook-modal').classList.add('hidden');
+      document.getElementById('webhook-modal').classList.remove('flex');
+    }
+
+    function saveWebhook() {
+      const url = document.getElementById('webhook-url-input').value.trim();
+      localStorage.setItem('margo_webhook_url', url);
+      closeWebhookModal();
+      if (url) {
+        sendDiscordWebhook("✅ **Margoplaats został pomyślnie połączony z tym kanałem Discord!**");
+        alert("Webhook zapisany! Wysłano wiadomość testową na Twój kanał Discord.");
+      }
+    }
+
+    function sendDiscordWebhook(content) {
+      const webhookUrl = localStorage.getItem('margo_webhook_url');
+      if (!webhookUrl) return;
+      fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: "Margoplaats Bot", content: content })
+      }).catch(err => console.error("Błąd wysyłania Webhooka:", err));
     }
 
     window.addEventListener('DOMContentLoaded', checkDiscordCallback);
