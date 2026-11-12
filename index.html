@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Margoplaats - Giełda Margonem</title>
+  <title>Margoplaats - Giełda Margonem LIVE</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Oficjalna biblioteka Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
 
@@ -18,14 +20,20 @@
         </div>
         <div>
           <span class="text-xl font-extrabold tracking-wider bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">MARGOPLAATS</span>
-          <span class="hidden sm:inline-block ml-2 text-xs bg-slate-800 border border-slate-700 text-slate-300 px-2 py-0.5 rounded">Giełda PLN & Złoto</span>
+          <span class="hidden sm:inline-flex items-center gap-1.5 ml-2 text-xs bg-emerald-950/80 border border-emerald-700/60 text-emerald-400 px-2 py-0.5 rounded">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> LIVE DB
+          </span>
         </div>
       </div>
 
       <div class="flex items-center gap-3">
+        <button onclick="fetchAuctions()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-2 rounded-lg transition cursor-pointer flex items-center gap-1.5" title="Odśwież listę aukcji">
+          <i class="fa-solid fa-rotate"></i>
+          <span class="hidden md:inline">Odśwież</span>
+        </button>
         <button onclick="openWebhookModal()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-2 rounded-lg transition cursor-pointer flex items-center gap-1.5" title="Podłącz powiadomienia na serwer Discord">
           <i class="fa-solid fa-bell text-amber-400"></i>
-          <span class="hidden md:inline">Webhook Discord</span>
+          <span class="hidden md:inline">Webhook</span>
         </button>
         <div id="auth-section"></div>
       </div>
@@ -101,7 +109,12 @@
     </div>
 
     <!-- Lista aukcji -->
-    <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="col-span-full text-center py-12 text-slate-400">
+        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3 text-amber-400 block"></i>
+        Łączenie z bazą danych Margoplaats...
+      </div>
+    </div>
 
   </main>
 
@@ -181,8 +194,8 @@
           <textarea id="item-desc" rows="2" placeholder="np. Nieprzypisany, płatność BLIK lub wymiana w Ithan." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500"></textarea>
         </div>
 
-        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg transition cursor-pointer">
-          Wystaw ofertę
+        <button type="submit" id="submit-btn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg transition cursor-pointer">
+          Opublikuj ofertę
         </button>
       </form>
     </div>
@@ -215,73 +228,24 @@
   </div>
 
   <script>
+    // ==========================================
+    // 1. KONFIGURACJA DISCORD & SUPABASE
+    // ==========================================
     const DISCORD_CLIENT_ID = "1570417107181772890";
     const REDIRECT_URI = "https://wujakamil.github.io/Margoplaats/";
 
+    const SUPABASE_URL = "https://nyiojlbcrtkamcgclomn.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55aW9qbGJjcnRrYW1jZ2Nsb21uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0ODI5NTEsImV4cCI6MjExMDA1ODk1MX0.FZh5jhc-6VvSLwL0_Y4I0Wpee103Wy_tP740Uv4lmEk";
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     let currentUser = JSON.parse(localStorage.getItem('margo_discord_user')) || null;
     let activeCategory = 'all';
+    let auctions = [];
 
-    const defaultAuctions = [
-      {
-        id: 101,
-        title: "Pierścień Mocy (120 lvl) - Legenda",
-        category: "Przedmioty",
-        world: "Katahha",
-        currency: "PLN",
-        currentBid: 90,
-        buyNow: 150,
-        img: "",
-        desc: "Czysty, nieprzypisany. Szybka wymiana w Ithan, płatność BLIK.",
-        seller: "Wuja Kamil",
-        lastBidder: "Brak ofert",
-        bidsCount: 0
-      },
-      {
-        id: 102,
-        title: "Wojownik 215 lvl + EQ Heroik/Leg",
-        category: "Konta",
-        world: "Katahha",
-        currency: "PLN",
-        currentBid: 240,
-        buyNow: 400,
-        img: "",
-        desc: "Konto bez wyrobionego klucza odzyskiwania, pełny dostęp z e-mailem.",
-        seller: "HandlarzKatahha",
-        lastBidder: "ZosiaSamosia",
-        bidsCount: 3
-      },
-      {
-        id: 103,
-        title: "Pakiet 1g (1000m) Złota",
-        category: "Złoto",
-        world: "Tarhuna",
-        currency: "PLN",
-        currentBid: 75,
-        buyNow: 110,
-        img: "",
-        desc: "Przekazanie przez bezpieczną aukcję w grze. Dostępne od ręki.",
-        seller: "GoldFarmer",
-        lastBidder: "Brak ofert",
-        bidsCount: 0
-      },
-      {
-        id: 104,
-        title: "Zbroja Pradawnych (150 lvl)",
-        category: "Przedmioty",
-        world: "Katahha",
-        currency: "m",
-        currentBid: 850,
-        buyNow: 1400,
-        img: "",
-        desc: "Sprzedam za złoto bezpośrednio na świecie Katahha.",
-        seller: "Anna",
-        lastBidder: "Kitiket",
-        bidsCount: 2
-      }
-    ];
-
-    let auctions = JSON.parse(localStorage.getItem('margoplaats_auctions_v2')) || defaultAuctions;
-
+    // ==========================================
+    // 2. LOGOWANIE DISCORD OAUTH2
+    // ==========================================
     function loginWithDiscord() {
       const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
       window.location.href = authUrl;
@@ -291,6 +255,7 @@
       localStorage.removeItem('margo_discord_user');
       currentUser = null;
       renderAuthSection();
+      renderAuctions();
     }
 
     async function checkDiscordCallback() {
@@ -326,7 +291,8 @@
         }
       }
       renderAuthSection();
-      renderAuctions();
+      await fetchAuctions();
+      subscribeToRealtime();
     }
 
     function renderAuthSection() {
@@ -357,7 +323,40 @@
       }
     }
 
-    // Zmiana zakładki kategorii
+    // ==========================================
+    // 3. POBIERANIE I ZAPIS DO BAZY SUPABASE
+    // ==========================================
+    async function fetchAuctions() {
+      const { data, error } = await supabaseClient
+        .from('auctions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Błąd pobierania aukcji:", error);
+        document.getElementById('auctions-grid').innerHTML = `
+          <div class="col-span-full bg-red-950/40 border border-red-800 rounded-xl text-center py-8 text-red-300">
+            Błąd połączenia z bazą danych: ${error.message}
+          </div>`;
+        return;
+      }
+
+      auctions = data || [];
+      renderAuctions();
+    }
+
+    // Nasłuchiwanie zmian na żywo (Realtime) + odświeżanie co 10s
+    function subscribeToRealtime() {
+      supabaseClient
+        .channel('public:auctions')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'auctions' }, () => {
+          fetchAuctions();
+        })
+        .subscribe();
+
+      setInterval(fetchAuctions, 10000);
+    }
+
     function setCategory(cat) {
       activeCategory = cat;
       document.querySelectorAll('.cat-btn').forEach(btn => {
@@ -403,8 +402,14 @@
         }
 
         const step = item.currency === 'PLN' ? 10 : 50;
+        const descText = item.description || item.desc || "Brak opisu.";
         const imgSection = item.img
           ? `<img src="${item.img}" alt="${item.title}" class="w-full h-36 object-cover rounded-lg mb-3 border border-slate-700">`
+          : '';
+
+        const isOwner = currentUser && (currentUser.username === item.seller || currentUser.tag === item.seller);
+        const deleteBtn = isOwner
+          ? `<button onclick="deleteAuction(${item.id})" class="text-xs text-red-400 hover:text-red-300 cursor-pointer ml-2" title="Usuń swoją ofertę"><i class="fa-solid fa-trash"></i></button>`
           : '';
 
         return `
@@ -422,13 +427,13 @@
               ${imgSection}
 
               <h3 class="text-lg font-bold text-white mb-1.5">${item.title}</h3>
-              <p class="text-sm text-slate-400 mb-4">${item.desc}</p>
+              <p class="text-sm text-slate-400 mb-4">${descText}</p>
             </div>
 
             <div class="border-t border-slate-800 pt-4 mt-2">
               <div class="flex justify-between items-end mb-3">
                 <div>
-                  <span class="text-xs text-slate-400 block">Aktualna oferta (${item.bidsCount}):</span>
+                  <span class="text-xs text-slate-400 block">Aktualna oferta (${item.bidsCount || 0}):</span>
                   <span class="text-2xl font-extrabold text-amber-400">${item.currentBid} ${item.currency}</span>
                   <span class="text-xs text-slate-500 block">Licytuje: <strong class="text-slate-300">${item.lastBidder}</strong></span>
                 </div>
@@ -448,7 +453,7 @@
               </div>
 
               <div class="mt-3 text-xs text-slate-500 flex justify-between items-center">
-                <span>Wystawił: <strong class="text-slate-300">${item.seller}</strong></span>
+                <span>Wystawił: <strong class="text-slate-300">${item.seller}</strong> ${deleteBtn}</span>
                 <span class="text-emerald-400 flex items-center gap-1"><i class="fa-brands fa-discord"></i> Zweryfikowany</span>
               </div>
             </div>
@@ -457,8 +462,8 @@
       }).join('');
     }
 
-    // Licytowanie z blokadą przekroczenia ceny Kup Teraz
-    function placeBid(id) {
+    // Licytowanie w bazie Supabase
+    async function placeBid(id) {
       if (!currentUser) {
         alert("Zaloguj się przez Discord, aby licytować!");
         return;
@@ -467,35 +472,110 @@
       if (!item) return;
 
       const step = item.currency === 'PLN' ? 10 : 50;
-      if (item.currentBid + step >= item.buyNow) {
+      const newBid = Number(item.currentBid) + step;
+
+      if (newBid >= Number(item.buyNow)) {
         if (confirm(`Twoje przebicie osiągnie lub przekroczy cenę Kup Teraz (${item.buyNow} ${item.currency}). Czy chcesz od razu kupić ten przedmiot?`)) {
-          buyNow(id);
+          await buyNow(id);
         }
         return;
       }
 
-      item.currentBid += step;
-      item.bidsCount += 1;
-      item.lastBidder = currentUser.username;
-      localStorage.setItem('margoplaats_auctions_v2', JSON.stringify(auctions));
-      renderAuctions();
+      const { error } = await supabaseClient
+        .from('auctions')
+        .update({
+          currentBid: newBid,
+          bidsCount: (item.bidsCount || 0) + 1,
+          lastBidder: currentUser.username
+        })
+        .eq('id', id);
 
-      sendDiscordWebhook(`🔨 **Nowa oferta!** Gracz **${currentUser.username}** podbił cenę za **${item.title}** (${item.world}) do **${item.currentBid} ${item.currency}**!`);
+      if (error) {
+        alert("Błąd podczas licytacji: " + error.message);
+        return;
+      }
+
+      sendDiscordWebhook(`🔨 **Nowa oferta!** Gracz **${currentUser.username}** podbił cenę za **${item.title}** (${item.world}) do **${newBid} ${item.currency}**!`);
+      await fetchAuctions();
     }
 
-    function buyNow(id) {
+    // Kup Teraz w bazie Supabase
+    async function buyNow(id) {
       if (!currentUser) {
         alert("Zaloguj się przez Discord, aby kupić przedmiot!");
         return;
       }
       const item = auctions.find(a => a.id === id);
-      if (item && confirm(`Czy na pewno chcesz kupić "${item.title}" za ${item.buyNow} ${item.currency}?`)) {
+      if (!item) return;
+
+      if (confirm(`Czy na pewno chcesz kupić "${item.title}" za ${item.buyNow} ${item.currency}?`)) {
+        const { error } = await supabaseClient
+          .from('auctions')
+          .delete()
+          .eq('id', id);
+
+        if (error) {
+          alert("Błąd podczas zakupu: " + error.message);
+          return;
+        }
+
         sendDiscordWebhook(`✅ **SPRZEDANE!** Gracz **${currentUser.username}** kupił **${item.title}** (${item.world}) za **${item.buyNow} ${item.currency}** od **${item.seller}**!`);
         alert(`Gratulacje ${currentUser.username}! Kupiłeś ofertę. Skontaktuj się ze sprzedawcą (${item.seller}) na Discordzie.`);
-        auctions = auctions.filter(a => a.id !== id);
-        localStorage.setItem('margoplaats_auctions_v2', JSON.stringify(auctions));
-        renderAuctions();
+        await fetchAuctions();
       }
+    }
+
+    // Usuwanie własnej aukcji
+    async function deleteAuction(id) {
+      if (!confirm("Czy na pewno chcesz usunąć swoją aukcję?")) return;
+      const { error } = await supabaseClient.from('auctions').delete().eq('id', id);
+      if (!error) await fetchAuctions();
+    }
+
+    // Dodawanie nowej aukcji do Supabase
+    async function addAuction(e) {
+      e.preventDefault();
+      const price = Number(document.getElementById('item-price').value);
+      const buyNow = Number(document.getElementById('item-buynow').value);
+
+      if (buyNow <= price) {
+        alert("Cena Kup Teraz musi być wyższa niż cena wywoławcza!");
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerText = "Publikowanie...";
+
+      const newAuction = {
+        title: document.getElementById('item-title').value,
+        category: document.getElementById('item-category').value,
+        world: document.getElementById('item-world').value,
+        currency: document.getElementById('item-currency').value,
+        currentBid: price,
+        buyNow: buyNow,
+        img: document.getElementById('item-img').value.trim(),
+        description: document.getElementById('item-desc').value || "Brak dodatkowego opisu.",
+        seller: currentUser.username,
+        lastBidder: "Brak ofert",
+        bidsCount: 0
+      };
+
+      const { error } = await supabaseClient.from('auctions').insert([newAuction]);
+
+      btn.disabled = false;
+      btn.innerText = "Opublikuj ofertę";
+
+      if (error) {
+        alert("Błąd zapisu do bazy: " + error.message);
+        return;
+      }
+
+      closeAddModal();
+      e.target.reset();
+      await fetchAuctions();
+
+      sendDiscordWebhook(`📢 **Nowa aukcja na Margoplaats!**\n📦 **${newAuction.title}** (${newAuction.category} | Świat: **${newAuction.world}**)\n💰 Wywoławcza: **${newAuction.currentBid} ${newAuction.currency}** | Kup Teraz: **${newAuction.buyNow} ${newAuction.currency}**\n👤 Wystawił: **${newAuction.seller}**\n🔗 Link: ${REDIRECT_URI}`);
     }
 
     function openAddModal() {
@@ -512,41 +592,6 @@
       document.getElementById('add-modal').classList.remove('flex');
     }
 
-    function addAuction(e) {
-      e.preventDefault();
-      const price = Number(document.getElementById('item-price').value);
-      const buyNow = Number(document.getElementById('item-buynow').value);
-
-      if (buyNow <= price) {
-        alert("Cena Kup Teraz musi być wyższa niż cena wywoławcza!");
-        return;
-      }
-
-      const newAuction = {
-        id: Date.now(),
-        title: document.getElementById('item-title').value,
-        category: document.getElementById('item-category').value,
-        world: document.getElementById('item-world').value,
-        currency: document.getElementById('item-currency').value,
-        currentBid: price,
-        buyNow: buyNow,
-        img: document.getElementById('item-img').value.trim(),
-        desc: document.getElementById('item-desc').value || "Brak dodatkowego opisu.",
-        seller: currentUser.username,
-        lastBidder: "Brak ofert",
-        bidsCount: 0
-      };
-
-      auctions.unshift(newAuction);
-      localStorage.setItem('margoplaats_auctions_v2', JSON.stringify(auctions));
-      closeAddModal();
-      e.target.reset();
-      renderAuctions();
-
-      sendDiscordWebhook(`📢 **Nowa aukcja na Margoplaats!**\n📦 **${newAuction.title}** (${newAuction.category} | Świat: **${newAuction.world}**)\n💰 Wywoławcza: **${newAuction.currentBid} ${newAuction.currency}** | Kup Teraz: **${newAuction.buyNow} ${newAuction.currency}**\n👤 Wystawił: **${newAuction.seller}**\n🔗 Link: ${REDIRECT_URI}`);
-    }
-
-    // Obsługa Webhooka Discord
     function openWebhookModal() {
       document.getElementById('webhook-url-input').value = localStorage.getItem('margo_webhook_url') || '';
       document.getElementById('webhook-modal').classList.remove('hidden');
@@ -563,7 +608,7 @@
       localStorage.setItem('margo_webhook_url', url);
       closeWebhookModal();
       if (url) {
-        sendDiscordWebhook("✅ **Margoplaats został pomyślnie połączony z tym kanałem Discord!**");
+        sendDiscordWebhook("✅ **Margoplaats LIVE został pomyślnie połączony z tym kanałem Discord!**");
         alert("Webhook zapisany! Wysłano wiadomość testową na Twój kanał Discord.");
       }
     }
