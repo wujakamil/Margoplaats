@@ -1,949 +1,409 @@
 <!DOCTYPE html>
-<html lang="pl" class="dark">
+<html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MargoMarket - Margonem Aukcje & Discord</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        discord: {
-                            blurple: '#5865F2',
-                            green: '#57F287',
-                            yellow: '#FEE75C',
-                            fuchsia: '#EB459E',
-                            red: '#ED4245',
-                            dark: '#23272A',
-                            darker: '#1e1f22',
-                            card: '#2b2d31',
-                            input: '#111214'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1e1f22; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #35383c; border-radius: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #5865F2; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Margoplaats - Giełda Margonem</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-[#111214] text-gray-100 min-h-screen flex flex-col justify-between selection:bg-[#5865F2] selection:text-white">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
-    <!-- Toast Notification Container -->
-    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
-
-    <!-- HEADER / NAVIGATION -->
-    <header class="sticky top-0 z-40 bg-[#1e1f22]/95 backdrop-blur border-b border-gray-800 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <!-- Brand -->
-            <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('marketplace')">
-                <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#5865F2] to-indigo-500 flex items-center justify-center shadow-lg shadow-[#5865F2]/20">
-                    <i class="fa-solid fa-gavel text-white text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-indigo-200 to-[#5865F2] bg-clip-text text-transparent">MargoMarket</h1>
-                    <span class="text-xs text-indigo-400 font-medium tracking-wider uppercase flex items-center gap-1">
-                        <i class="fa-brands fa-discord"></i> Discord Verified
-                    </span>
-                </div>
-            </div>
-
-            <!-- Navigation Links -->
-            <nav class="hidden md:flex items-center gap-1 bg-[#111214] p-1.5 rounded-xl border border-gray-800">
-                <button onclick="switchTab('marketplace')" id="nav-btn-marketplace" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-[#5865F2] text-white shadow">
-                    <i class="fa-solid fa-store mr-2"></i>Rynek Aukcji
-                </button>
-                <button onclick="switchTab('my-bids')" id="nav-btn-my-bids" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-gray-800">
-                    <i class="fa-solid fa-hand-holding-dollar mr-2"></i>Moje Licytacje
-                </button>
-                <button onclick="switchTab('my-listings')" id="nav-btn-my-listings" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-gray-800">
-                    <i class="fa-solid fa-box-archive mr-2"></i>Moje Oferty
-                </button>
-            </nav>
-
-            <!-- User Auth & Action Buttons -->
-            <div class="flex items-center gap-3">
-                <button onclick="openAddListingModal()" class="hidden sm:flex items-center gap-2 bg-gradient-to-r from-[#57F287] to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-gray-900 font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 transition-all text-sm">
-                    <i class="fa-solid fa-plus-circle text-base"></i> Wystaw Przedmiot
-                </button>
-
-                <!-- Auth Area -->
-                <div id="auth-container">
-                    <!-- Populated dynamically via JS -->
-                </div>
-
-                <!-- Mobile menu toggle -->
-                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl bg-[#2b2d31] text-gray-300 hover:text-white">
-                    <i class="fa-solid fa-bars text-lg"></i>
-                </button>
-            </div>
+  <!-- Pasek nawigacji -->
+  <nav class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="bg-amber-500/20 border border-amber-500/50 p-2 rounded-lg text-amber-400">
+          <i class="fa-solid fa-gavel text-xl"></i>
         </div>
-
-        <!-- Mobile Menu Drawer -->
-        <div id="mobile-menu" class="hidden md:hidden bg-[#1e1f22] border-t border-gray-800 px-4 pt-2 pb-4 flex flex-col gap-2">
-            <button onclick="switchTab('marketplace'); toggleMobileMenu();" class="text-left px-3 py-2 rounded-lg text-sm font-semibold text-white bg-[#5865F2]">Rynek Aukcji</button>
-            <button onclick="switchTab('my-bids'); toggleMobileMenu();" class="text-left px-3 py-2 rounded-lg text-sm font-semibold text-gray-300 hover:bg-gray-800">Moje Licytacje</button>
-            <button onclick="switchTab('my-listings'); toggleMobileMenu();" class="text-left px-3 py-2 rounded-lg text-sm font-semibold text-gray-300 hover:bg-gray-800">Moje Oferty</button>
-            <button onclick="openAddListingModal(); toggleMobileMenu();" class="mt-2 flex items-center justify-center gap-2 bg-[#57F287] text-gray-900 font-bold px-4 py-2.5 rounded-xl text-sm">
-                <i class="fa-solid fa-plus-circle"></i> Wystaw Przedmiot
-            </button>
+        <div>
+          <span class="text-xl font-bold tracking-wider bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">MARGOPLAATS</span>
+          <span class="hidden sm:inline-block ml-2 text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">Giełda PLN</span>
         </div>
-    </header>
+      </div>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Sekcja użytkownika / Logowanie Discord -->
+      <div id="auth-section">
+        <button onclick="loginWithDiscord()" class="bg-[#5865F2] hover:bg-[#4752C4] text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition shadow-lg shadow-[#5865F2]/25 cursor-pointer">
+          <i class="fa-brands fa-discord"></i>
+          <span>Zaloguj przez Discord</span>
+        </button>
+      </div>
+    </div>
+  </nav>
 
-        <!-- DISCORD BANNER / WIDGET INTRO -->
-        <section class="mb-8 bg-gradient-to-r from-[#2b2d31] via-[#23272A] to-[#1e1f22] border border-indigo-500/30 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="absolute -right-10 -bottom-10 opacity-10 text-indigo-500 pointer-events-none">
-                <i class="fa-brands fa-discord text-9xl"></i>
-            </div>
-            <div class="space-y-2 z-10 text-center md:text-left">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#5865F2]/20 text-[#5865F2] text-xs font-bold uppercase tracking-wider border border-[#5865F2]/30">
-                    <i class="fa-solid fa-shield-halved"></i> Bezpieczny Handel Margonem
-                </div>
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Licytuj Legendy i Konta za PLN w pełni bezpiecznie</h2>
-                <p class="text-gray-400 text-sm max-w-2xl">Zaloguj się kontem Discord, weryfikuj sprzedających po systemie ocen, licytuj w czasie rzeczywistym i odbieraj powiadomienia bota o przebitych ofertach!</p>
-            </div>
-            <div class="z-10 flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                <button onclick="toggleDiscordLog()" class="flex items-center justify-center gap-2 bg-[#5865F2] hover:bg-indigo-600 text-white font-bold px-5 py-3 rounded-xl shadow-lg shadow-[#5865F2]/30 transition-all text-sm">
-                    <i class="fa-brands fa-discord text-lg"></i> Powiadomienia Discord <span id="discord-badge-count" class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">3</span>
-                </button>
-            </div>
-        </section>
+  <!-- Główna zawartość -->
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    
+    <!-- Nagłówek i filtry -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700/80">
+      <div class="flex flex-wrap gap-3 w-full md:w-auto">
+        <select id="filter-world" onchange="renderAuctions()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+          <option value="all">Wszystkie światy</option>
+          <option value="Katahha">Katahha</option>
+          <option value="Tarhuna">Tarhuna</option>
+          <option value="Aldous">Aldous</option>
+          <option value="Tempest">Tempest</option>
+          <option value="Zorza">Zorza</option>
+        </select>
 
-        <!-- TAB 1: MARKETPLACE -->
-        <div id="tab-marketplace" class="space-y-6">
-            <!-- Filters & Search Bar Toolbar -->
-            <div class="bg-[#1e1f22] p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-md flex flex-col lg:flex-row items-center justify-between gap-4">
-                <!-- Search input -->
-                <div class="relative w-full lg:w-80">
-                    <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
-                    <input type="text" id="search-input" oninput="filterListings()" placeholder="Szukaj itemu lub postaci (np. Pierek)..." class="w-full bg-[#111214] text-gray-200 pl-10 pr-4 py-2.5 rounded-xl border border-gray-700/60 focus:outline-none focus:border-[#5865F2] text-sm transition-all">
-                </div>
+        <select id="filter-category" onchange="renderAuctions()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+          <option value="all">Wszystkie kategorie</option>
+          <option value="Legenda">Przedmiot: Legenda</option>
+          <option value="Konto">Konto / Postać</option>
+          <option value="Złoto">Złoto (m/g)</option>
+        </select>
+      </div>
 
-                <!-- Filters Group -->
-                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                    <!-- Category Filter -->
-                    <select id="filter-category" onchange="filterListings()" class="bg-[#111214] text-gray-200 px-4 py-2.5 rounded-xl border border-gray-700/60 focus:outline-none focus:border-[#5865F2] text-sm font-medium">
-                        <option value="all">Wszystkie kategorie</option>
-                        <option value="Przedmioty">Przedmioty (Legendy/Heroiki)</option>
-                        <option value="Konta">Konta / Postacie</option>
-                    </select>
-
-                    <!-- Server Filter -->
-                    <select id="filter-server" onchange="filterListings()" class="bg-[#111214] text-gray-200 px-4 py-2.5 rounded-xl border border-gray-700/60 focus:outline-none focus:border-[#5865F2] text-sm font-medium">
-                        <option value="all">Wszystkie światy</option>
-                        <option value="Katahha">Katahha</option>
-                        <option value="Aldur">Aldur</option>
-                        <option value="Radon">Radon</option>
-                        <option value="Classic">Classic</option>
-                        <option value="Brutal">Brutal</option>
-                    </select>
-
-                    <!-- Sort Order -->
-                    <select id="filter-sort" onchange="filterListings()" class="bg-[#111214] text-gray-200 px-4 py-2.5 rounded-xl border border-gray-700/60 focus:outline-none focus:border-[#5865F2] text-sm font-medium">
-                        <option value="newest">Najnowsze</option>
-                        <option value="price-asc">Cena: rosnąco</option>
-                        <option value="price-desc">Cena: malejąco</option>
-                        <option value="ending">Koniec za chwilę</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Listings Grid -->
-            <div id="listings-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Injected via JavaScript -->
-            </div>
-            
-            <!-- Empty state -->
-            <div id="empty-state" class="hidden text-center py-16 bg-[#1e1f22] rounded-2xl border border-gray-800">
-                <i class="fa-solid fa-box-open text-5xl text-gray-600 mb-4"></i>
-                <h3 class="text-xl font-bold text-gray-300">Brak ofert spełniających kryteria</h3>
-                <p class="text-gray-500 text-sm mt-1">Spróbuj zmienić filtry wyszukiwania lub wystaw własną aukcję.</p>
-            </div>
-        </div>
-
-        <!-- TAB 2: MY BIDS -->
-        <div id="tab-my-bids" class="hidden space-y-6">
-            <div class="bg-[#1e1f22] p-6 rounded-2xl border border-gray-800 shadow-md">
-                <h2 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-hand-holding-dollar text-indigo-400 mr-2"></i>Moje Aktywne Licytacje</h2>
-                <p class="text-gray-400 text-sm">Przedmioty i konta, na które złożyłeś ofertę. Otrzymasz powiadomienie z Discorda, gdy ktoś Cię przebije.</p>
-            </div>
-            <div id="my-bids-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Injected via JS -->
-            </div>
-            <div id="empty-bids" class="hidden text-center py-16 bg-[#1e1f22] rounded-2xl border border-gray-800">
-                <i class="fa-solid fa-gavel text-5xl text-gray-600 mb-4"></i>
-                <h3 class="text-xl font-bold text-gray-300">Nie licytujesz jeszcze żadnych przedmiotów</h3>
-                <p class="text-gray-500 text-sm mt-1">Przejdź do rynku aukcji i zalicytuj coś ciekawego!</p>
-            </div>
-        </div>
-
-        <!-- TAB 3: MY LISTINGS -->
-        <div id="tab-my-listings" class="hidden space-y-6">
-            <div class="bg-[#1e1f22] p-6 rounded-2xl border border-gray-800 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-white mb-2"><i class="fa-solid fa-box-archive text-emerald-400 mr-2"></i>Moje Wystawione Oferty</h2>
-                    <p class="text-gray-400 text-sm">Zarządzaj swoimi przedmiotami i postaciami wystawionymi na sprzedaż.</p>
-                </div>
-                <button onclick="openAddListingModal()" class="bg-[#57F287] text-gray-900 font-bold px-4 py-2.5 rounded-xl text-sm shadow hover:bg-emerald-400 transition-all">
-                    <i class="fa-solid fa-plus mr-1"></i> Wystaw Nowy
-                </button>
-            </div>
-            <div id="my-listings-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Injected via JS -->
-            </div>
-            <div id="empty-listings" class="hidden text-center py-16 bg-[#1e1f22] rounded-2xl border border-gray-800">
-                <i class="fa-solid fa-store-slash text-5xl text-gray-600 mb-4"></i>
-                <h3 class="text-xl font-bold text-gray-300">Nie wystawiłeś jeszcze żadnych przedmiotów</h3>
-                <p class="text-gray-500 text-sm mt-1">Kliknij przycisk powyżej, aby dodać swoją pierwszą aukcję.</p>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="bg-[#1e1f22] border-t border-gray-800 mt-16 py-8 text-center text-sm text-gray-500">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-[#5865F2] flex items-center justify-center text-white">
-                    <i class="fa-solid fa-gavel text-sm"></i>
-                </div>
-                <span class="font-bold text-gray-300">MargoMarket &copy; 2026</span>
-            </div>
-            <p>Nie jesteśmy powiązani z Garmory Sp. z o.o. Projekt fanowski inspirowany grą Margonem.</p>
-            <div class="flex gap-4">
-                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-discord"></i> Discord</a>
-                <a href="#" class="hover:text-white transition"><i class="fa-solid fa-shield-alt"></i> Regulamin</a>
-            </div>
-        </div>
-    </footer>
-
-
-    <!-- MODAL: ITEM DETAILS / BIDDING -->
-    <div id="item-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-[#2b2d31] border border-gray-700/80 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
-            <button onclick="closeItemModal()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-[#111214]/80 text-gray-300 hover:text-white flex items-center justify-center transition">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div id="modal-content">
-                <!-- Populated dynamically -->
-            </div>
-        </div>
+      <button onclick="openAddModal()" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2 rounded-lg transition flex items-center justify-center space-x-2 cursor-pointer shadow-lg shadow-amber-500/20">
+        <i class="fa-solid fa-plus"></i>
+        <span>Wystaw aukcję</span>
+      </button>
     </div>
 
-
-    <!-- MODAL: ADD NEW LISTING -->
-    <div id="add-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-[#2b2d31] border border-gray-700/80 rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl relative">
-            <div class="p-6 border-b border-gray-800 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-[#57F287]/20 text-[#57F287] flex items-center justify-center">
-                        <i class="fa-solid fa-circle-plus text-lg"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">Wystaw przedmiot lub konto</h3>
-                        <p class="text-xs text-gray-400">Dodaj ofertę na bezpieczny rynek Margonem</p>
-                    </div>
-                </div>
-                <button onclick="closeAddListingModal()" class="w-8 h-8 rounded-full bg-[#111214] text-gray-400 hover:text-white flex items-center justify-center">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <form id="add-listing-form" onsubmit="handleCreateListing(event)" class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Tytuł ogłoszenia / Nazwa itemu *</label>
-                    <input type="text" id="new-title" required placeholder="np. Rękawice Zniszczenia / Postać Łowca 150lvl" class="w-full bg-[#111214] text-white px-4 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-[#5865F2] text-sm">
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Kategoria *</label>
-                        <select id="new-category" class="w-full bg-[#111214] text-white px-4 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-[#5865F2] text-sm">
-                            <option value="Przedmioty">Przedmiot (Legenda/Heroik)</option>
-                            <option value="Konta">Konto (Postać)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Świat *</label>
-                        <select id="new-server" class="w-full bg-[#111214] text-white px-4 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-[#5865F2] text-sm">
-                            <option value="Katahha">Katahha</option>
-                            <option value="Aldur">Aldur</option>
-                            <option value="Radon">Radon</option>
-                            <option value="Classic">Classic</option>
-                            <option value="Brutal">Brutal</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Cena Wywoławcza / Start (PLN) *</label>
-                        <input type="number" id="new-price" required min="1" placeholder="np. 150" class="w-full bg-[#111214] text-white px-4 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-[#5865F2] text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Cena Kup Teraz (PLN) [Opcjonalnie]</label>
-                        <input type="number" id="new-buynow" min="1" placeholder="np. 300" class="w-full bg-[#111214] text-white px-4 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-[#5865F2] text-sm">
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Poziom (lvl) przedmiotu/postaci *</label>
-                        <input type="number" id="new-level" required min="1" max="500" placeholder="np. 120" class="w-full bg-[#111214] text-white px-4 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-[#5865F2] text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Link do Screena (URL) *</label>
-                        <input type="url" id="new-image" required placeholder="https://i.imgur.com/..." class="w-full bg-[#111214] text-white px-4 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-[#5865F2] text-sm">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">Opis przedmiotu / statystyki *</label>
-                    <textarea id="new-desc" rows="3" required placeholder="Opisz bonusy, odporności lub szczegóły konta..." class="w-full bg-[#111214] text-white px-3 py-2 rounded-xl border border-gray-700 focus:outline-none focus:border-[#5865F2] text-sm custom-scrollbar"></textarea>
-                </div>
-                <div class="pt-2 flex justify-end gap-3">
-                    <button type="button" onclick="closeAddListingModal()" class="px-5 py-2.5 rounded-xl bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold transition">Anuluj</button>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-[#57F287] hover:bg-emerald-400 text-gray-900 text-sm font-bold shadow-lg shadow-emerald-500/20 transition">Wystaw Aukcję</button>
-                </div>
-            </form>
-        </div>
+    <!-- Lista aukcji -->
+    <div id="auctions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Generowane przez JS -->
     </div>
 
+  </main>
 
-    <!-- DISCORD NOTIFICATIONS SLIDER / MODAL -->
-    <div id="discord-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-[#2b2d31] border-l border-gray-800 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-4 bg-[#1e1f22] border-b border-gray-800 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <i class="fa-brands fa-discord text-[#5865F2] text-xl"></i>
-                <h3 class="font-bold text-white text-base">Powiadomienia Discord Bot</h3>
-            </div>
-            <button onclick="toggleDiscordLog()" class="w-8 h-8 rounded-lg bg-[#111214] text-gray-400 hover:text-white flex items-center justify-center">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+  <!-- Modal dodawania aukcji -->
+  <div id="add-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-amber-400">Wystaw na sprzedaż</h3>
+        <button onclick="closeAddModal()" class="text-slate-400 hover:text-white cursor-pointer">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <form onsubmit="addAuction(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Nazwa przedmiotu / konta</label>
+          <input type="text" id="item-title" required placeholder="np. Pierścień Mocy 120 lvl" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
         </div>
-        <div id="discord-notifications-list" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-            <!-- Populated dynamically -->
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Kategoria</label>
+            <select id="item-category" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+              <option value="Legenda">Legenda</option>
+              <option value="Konto">Konto</option>
+              <option value="Złoto">Złoto</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Świat</label>
+            <select id="item-world" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+              <option value="Katahha">Katahha</option>
+              <option value="Tarhuna">Tarhuna</option>
+              <option value="Aldous">Aldous</option>
+              <option value="Tempest">Tempest</option>
+              <option value="Zorza">Zorza</option>
+            </select>
+          </div>
         </div>
-        <div class="p-3 bg-[#1e1f22] border-t border-gray-800 text-center">
-            <button onclick="clearNotifications()" class="text-xs text-gray-400 hover:text-white font-medium">Wyczyść wszystkie powiadomienia</button>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Cena wywoławcza (PLN)</label>
+            <input type="number" id="item-price" required min="1" placeholder="50" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Kup Teraz (PLN)</label>
+            <input type="number" id="item-buynow" required min="1" placeholder="120" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+          </div>
         </div>
+
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Krótki opis / Wymagania</label>
+          <textarea id="item-desc" rows="2" placeholder="np. Czysty, bez przypisania, płatność BLIK." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-500"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg transition cursor-pointer">
+          Opublikuj ofertę
+        </button>
+      </form>
     </div>
+  </div>
 
+  <script>
+    // ==========================================
+    // KONFIGURACJA DISCORD OAUTH2 (Margoplaats)
+    // ==========================================
+    const DISCORD_CLIENT_ID = "1570417107181772890";
+    const REDIRECT_URI = "https://wujakamil.github.io/Margoplaats/";
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // Mock State & Storage
-        let currentUser = JSON.parse(localStorage.getItem('margo_user')) || null;
-        
-        let defaultListings = [
-            {
-                id: 'item-1',
-                title: 'Pierek (Rękawice Zniszczenia)',
-                category: 'Przedmioty',
-                server: 'Katahha',
-                level: 120,
-                price: 350,
-                buyNowPrice: 600,
-                highestBid: 380,
-                highestBidder: 'Kamil#1337',
-                seller: 'ShadowMage#9921',
-                sellerRating: 4.9,
-                image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80',
-                description: 'Legendarne rękawice zniszczenia na 120 lvl świat Katahha. Super bonusy do szybkości ataku i krytyka. Sprzedaż przez przekazanie w grze lub pośrednika.',
-                endTime: Date.now() + 1000 * 60 * 60 * 12, // 12 hours from now
-                bidsCount: 4
-            },
-            {
-                id: 'item-2',
-                title: 'Konto Tancerz Ostrzy 240lvl + Unikaty',
-                category: 'Konta',
-                server: 'Aldur',
-                level: 240,
-                price: 1200,
-                buyNowPrice: 1800,
-                highestBid: 1200,
-                highestBidder: 'BraveKnight#4412',
-                seller: 'Vortex#0001',
-                sellerRating: 5.0,
-                image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80',
-                description: 'Pełne konto Tancerza Ostrzy na świecie Aldur. W zestawie eq legendarne + sporo słupków złota. Zmiana maila oraz pełne wsparcie Discord.',
-                endTime: Date.now() + 1000 * 60 * 60 * 24 * 2, // 2 days
-                bidsCount: 1
-            },
-            {
-                id: 'item-3',
-                title: 'Buty Goplany (Heroik)',
-                category: 'Przedmioty',
-                server: 'Radon',
-                level: 85,
-                price: 90,
-                buyNowPrice: 150,
-                highestBid: 110,
-                highestBidder: 'MargonemFan#777',
-                seller: 'Kacperx#3312',
-                sellerRating: 4.7,
-                image: 'https://images.unsplash.com/photo-1612287233202-b51d3ed6175c?auto=format&fit=crop&w=600&q=80',
-                description: 'Heroiczne buty na 85 poziom. Świetne odporności na magię. Szybka transakcja.',
-                endTime: Date.now() + 1000 * 60 * 60 * 4, // 4 hours
-                bidsCount: 3
-            },
-            {
-                id: 'item-4',
-                title: 'Zbroja Piekielnego Cyklopa',
-                category: 'Przedmioty',
-                server: 'Katahha',
-                level: 150,
-                price: 500,
-                buyNowPrice: 850,
-                highestBid: 550,
-                highestBidder: 'Natan#2026',
-                seller: 'ShadowMage#9921',
-                sellerRating: 4.9,
-                image: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=600&q=80',
-                description: 'Potężna zbroja z Cyklopa na Katahsie. Bardzo wysoka redukcja obrażeń fizycznych.',
-                endTime: Date.now() + 1000 * 60 * 60 * 18,
-                bidsCount: 5
-            }
-        ];
+    let currentUser = JSON.parse(localStorage.getItem('margo_discord_user')) || null;
 
-        let listings = JSON.parse(localStorage.getItem('margo_listings')) || defaultListings;
-        let notifications = JSON.parse(localStorage.getItem('margo_notifications')) || [
-            { id: 1, text: '🤖 [Discord Bot]: Pomyślnie połączono z serwerem MargoMarket.', time: '10 min temu', unread: true },
-            { id: 2, text: '🤖 [Discord Bot]: Ktoś przebił Twoją ofertę na Rękawice Zniszczenia!', time: '1 godz. temu', unread: true },
-            { id: 3, text: '🤖 [Discord Bot]: Twoja oferta "Zbroja Cyklopa" zyskała zainteresowanie.', time: '3 godz. temu', unread: true }
-        ];
+    // Przykładowe aukcje na start
+    const defaultAuctions = [
+      {
+        id: 1,
+        title: "Pierścień Mocy (120 lvl)",
+        category: "Legenda",
+        world: "Katahha",
+        currentBid: 85,
+        buyNow: 150,
+        desc: "Legendarny pierścień, nieprzypisany. Szybka wymiana w Ithan.",
+        seller: "Kamil#0001",
+        lastBidder: "Brak ofert",
+        bidsCount: 0
+      },
+      {
+        id: 2,
+        title: "Wojownik 215 lvl + EQ Heroik/Leg",
+        category: "Konto",
+        world: "Katahha",
+        currentBid: 220,
+        buyNow: 400,
+        desc: "Konto bez wyrobionego klucza odzyskiwania, pełny dostęp.",
+        seller: "HandlarzKatahha",
+        lastBidder: "ZosiaSamosia",
+        bidsCount: 3
+      },
+      {
+        id: 3,
+        title: "Pakiet 500m złota",
+        category: "Złoto",
+        world: "Tarhuna",
+        currentBid: 40,
+        buyNow: 65,
+        desc: "Przekazanie przez bezpieczną aukcję w grze.",
+        seller: "GoldFarmer",
+        lastBidder: "Brak ofert",
+        bidsCount: 0
+      }
+    ];
 
-        let activeTab = 'marketplace';
-        let currentModalItem = null;
+    let auctions = JSON.parse(localStorage.getItem('margoplaats_auctions')) || defaultAuctions;
 
-        // Initialize App
-        window.onload = function() {
-            renderAuthWidget();
-            filterListings();
-            updateNotificationBadge();
-        };
+    // Funkcja przekierowująca do logowania Discord
+    function loginWithDiscord() {
+      const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+      window.location.href = authUrl;
+    }
 
-        // Tab Switching Logic
-        function switchTab(tabName) {
-            activeTab = tabName;
-            document.getElementById('tab-marketplace').classList.add('hidden');
-            document.getElementById('tab-my-bids').classList.add('hidden');
-            document.getElementById('tab-my-listings').classList.add('hidden');
+    // Wylogowanie
+    function logout() {
+      localStorage.removeItem('margo_discord_user');
+      currentUser = null;
+      renderAuthSection();
+    }
 
-            document.getElementById('nav-btn-marketplace').className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-gray-800";
-            document.getElementById('nav-btn-my-bids').className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-gray-800";
-            document.getElementById('nav-btn-my-listings').className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-gray-800";
+    // Odbieranie tokenu z paska adresu po powrocie z Discorda
+    async function checkDiscordCallback() {
+      if (window.location.hash.includes('access_token')) {
+        const fragment = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = fragment.get('access_token');
+        const tokenType = fragment.get('token_type');
 
-            if (tabName === 'marketplace') {
-                document.getElementById('tab-marketplace').classList.remove('hidden');
-                document.getElementById('nav-btn-marketplace').className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-[#5865F2] text-white shadow";
-                filterListings();
-            } else if (tabName === 'my-bids') {
-                document.getElementById('tab-my-bids').classList.remove('hidden');
-                document.getElementById('nav-btn-my-bids').className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-[#5865F2] text-white shadow";
-                renderMyBids();
-            } else if (tabName === 'my-listings') {
-                document.getElementById('tab-my-listings').classList.remove('hidden');
-                document.getElementById('nav-btn-my-listings').className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-[#5865F2] text-white shadow";
-                renderMyListings();
-            }
-        }
+        // Czyszczenie adresu URL z tokenu
+        window.history.replaceState({}, document.title, window.location.pathname);
 
-        // Discord Auth Mock UI
-        function renderAuthWidget() {
-            const container = document.getElementById('auth-container');
-            if (!currentUser) {
-                container.innerHTML = `
-                    <button onclick="loginWithDiscord()" class="flex items-center gap-2 bg-[#5865F2] hover:bg-indigo-600 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition shadow-lg shadow-[#5865F2]/30">
-                        <i class="fa-brands fa-discord text-lg"></i> Zaloguj przez Discord
-                    </button>
-                `;
-            } else {
-                container.innerHTML = `
-                    <div class="flex items-center gap-3 bg-[#2b2d31] border border-gray-700/80 px-3 py-1.5 rounded-xl">
-                        <div class="relative">
-                            <img src="${currentUser.avatar}" class="w-9 h-9 rounded-full object-cover border-2 border-[#57F287]" alt="Avatar">
-                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#57F287] border-2 border-[#2b2d31] rounded-full"></span>
-                        </div>
-                        <div class="hidden sm:block text-left">
-                            <div class="text-xs font-bold text-white flex items-center gap-1">
-                                ${currentUser.username} 
-                                <span class="bg-[#5865F2]/30 text-[#5865F2] text-[10px] px-1.5 py-0.2 rounded font-mono">VERIFIED</span>
-                            </div>
-                            <div class="text-[10px] text-gray-400">ID: ${currentUser.id}</div>
-                        </div>
-                        <button onclick="logoutDiscord()" title="Wyloguj" class="text-gray-400 hover:text-red-400 p-1.5 transition">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                        </button>
-                    </div>
-                `;
-            }
-        }
+        try {
+          const response = await fetch('https://discord.com/api/users/@me', {
+            headers: { authorization: `${tokenType} ${accessToken}` }
+          });
 
-        function loginWithDiscord() {
-            // Prompt mock user or pick random
-            const names = ['Kamil#1337', 'Kacperx#4402', 'MargonemKing#007', 'BlikMaster#9911'];
-            const avatars = [
-                'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-                'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80',
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-            ];
-            const randomName = names[Math.floor(Math.random() * names.length)];
-            const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+          if (response.ok) {
+            const data = await response.json();
+            const avatarUrl = data.avatar
+              ? `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`
+              : `https://cdn.discordapp.com/embed/avatars/0.png`;
 
             currentUser = {
-                id: Math.floor(100000 + Math.random() * 900000),
-                username: randomName,
-                avatar: randomAvatar
-            };
-            localStorage.setItem('margo_user', JSON.stringify(currentUser));
-            renderAuthWidget();
-            showToast(`Zalogowano pomyślnie jako ${randomName}!`, 'success');
-            addNotification(`🤖 [Discord Bot]: Witaj na pokładzie, ${randomName}! Twoje konto Discord zostało pomyślnie powiązane z MargoMarket.`);
-        }
-
-        function logoutDiscord() {
-            currentUser = null;
-            localStorage.removeItem('margo_user');
-            renderAuthWidget();
-            showToast('Wylogowano pomyślnie.', 'info');
-        }
-
-        // Filter and Render Marketplace Listings
-        function filterListings() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const category = document.getElementById('filter-category').value;
-            const server = document.getElementById('filter-server').value;
-            const sort = document.getElementById('filter-sort').value;
-
-            let filtered = listings.filter(item => {
-                const matchQuery = item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query) || item.seller.toLowerCase().includes(query);
-                const matchCategory = category === 'all' || item.category === category;
-                const matchServer = server === 'all' || item.server === server;
-                return matchQuery && matchCategory && matchServer;
-            });
-
-            // Sorting
-            filtered.sort((a, b) => {
-                if (sort === 'newest') return b.id.localeCompare(a.id);
-                if (sort === 'price-asc') return a.highestBid - b.highestBid;
-                if (sort === 'price-desc') return b.highestBid - a.highestBid;
-                if (sort === 'ending') return a.endTime - b.endTime;
-                return 0;
-            });
-
-            const grid = document.getElementById('listings-grid');
-            const emptyState = document.getElementById('empty-state');
-
-            grid.innerHTML = '';
-            if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            }
-            emptyState.classList.add('hidden');
-
-            filtered.forEach(item => {
-                grid.appendChild(createListingCard(item));
-            });
-        }
-
-        function createListingCard(item) {
-            const card = document.createElement('div');
-            card.className = "bg-[#1e1f22] border border-gray-800 rounded-2xl overflow-hidden shadow-lg hover:border-[#5865F2]/60 transition-all duration-300 flex flex-col justify-between group";
-            
-            const timeLeft = formatTimeLeft(item.endTime);
-            const isMyItem = currentUser && item.seller === currentUser.username;
-
-            card.innerHTML = `
-                <div class="relative overflow-hidden aspect-[4/3] bg-gray-900 cursor-pointer" onclick="openItemModal('${item.id}')">
-                    <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x400/23272A/5865F2?text=Margonem+Item'">
-                    <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                        <span class="bg-[#111214]/80 backdrop-blur text-indigo-400 font-bold text-xs px-2.5 py-1 rounded-lg border border-gray-700/60">
-                            ${item.server}
-                        </span>
-                        <span class="bg-[#5865F2]/90 text-white font-bold text-xs px-2.5 py-1 rounded-lg shadow">
-                            Lvl ${item.level}
-                        </span>
-                    </div>
-                    ${isMyItem ? '<span class="absolute top-3 right-3 bg-emerald-500 text-gray-900 font-bold text-xs px-2 py-1 rounded-lg">Twoja oferta</span>' : ''}
-                </div>
-                <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
-                    <div>
-                        <div class="flex items-center justify-between text-xs text-gray-400 mb-1">
-                            <span>${item.category}</span>
-                            <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-clock mr-1"></i>${timeLeft}</span>
-                        </div>
-                        <h3 onclick="openItemModal('${item.id}')" class="font-bold text-white text-base hover:text-[#5865F2] cursor-pointer transition line-clamp-1">${item.title}</h3>
-                    </div>
-
-                    <div class="bg-[#111214] p-3 rounded-xl border border-gray-800/80 flex items-center justify-between">
-                        <div>
-                            <div class="text-[10px] text-gray-400 uppercase tracking-wider">Aktualna Oferta</div>
-                            <div class="text-lg font-extrabold text-[#57F287]">${item.highestBid} PLN</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-[10px] text-gray-400 uppercase tracking-wider">Licytacje</div>
-                            <div class="text-sm font-bold text-gray-200">${item.bidsCount || 0} ofert</div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between pt-2 border-t border-gray-800">
-                        <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
-                                ${item.seller.charAt(0)}
-                            </div>
-                            <span class="text-xs text-gray-300 font-medium">${item.seller}</span>
-                        </div>
-                        <button onclick="openItemModal('${item.id}')" class="bg-[#5865F2] hover:bg-indigo-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-md shadow-[#5865F2]/20">
-                            Szczegóły
-                        </button>
-                    </div>
-                </div>
-            `;
-            return card;
-        }
-
-        // Format time left
-        function formatTimeLeft(endTime) {
-            const diff = endTime - Date.now();
-            if (diff <= 0) return 'Zakończona';
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const days = Math.floor(hours / 24);
-            if (days > 0) return `${days}d ${hours % 24}h`;
-            return `${hours}h`;
-        }
-
-        // Render My Bids
-        function renderMyBids() {
-            const grid = document.getElementById('my-bids-grid');
-            const emptyBids = document.getElementById('empty-bids');
-            grid.innerHTML = '';
-
-            if (!currentUser) {
-                emptyBids.classList.remove('hidden');
-                emptyBids.querySelector('h3').textContent = 'Zaloguj się przez Discord';
-                emptyBids.querySelector('p').textContent = 'Musisz być zalogowany, aby widzieć swoje licytacje.';
-                return;
-            }
-
-            // Find items where highestBidder is current user or user has bid
-            const myBidsList = listings.filter(item => item.highestBidder === currentUser.username);
-
-            if (myBidsList.length === 0) {
-                emptyBids.classList.remove('hidden');
-                emptyBids.querySelector('h3').textContent = 'Nie licytujesz jeszcze żadnych przedmiotów';
-                emptyBids.querySelector('p').textContent = 'Przejdź do rynku aukcji i zalicytuj coś ciekawego!';
-                return;
-            }
-
-            emptyBids.classList.add('hidden');
-            myBidsList.forEach(item => {
-                grid.appendChild(createListingCard(item));
-            });
-        }
-
-        // Render My Listings
-        function renderMyListings() {
-            const grid = document.getElementById('my-listings-grid');
-            const emptyListings = document.getElementById('empty-listings');
-            grid.innerHTML = '';
-
-            if (!currentUser) {
-                emptyListings.classList.remove('hidden');
-                emptyListings.querySelector('h3').textContent = 'Zaloguj się przez Discord';
-                emptyListings.querySelector('p').textContent = 'Musisz być zalogowany, aby widzieć swoje oferty.';
-                return;
-            }
-
-            const myListingsList = listings.filter(item => item.seller === currentUser.username);
-
-            if (myListingsList.length === 0) {
-                emptyListings.classList.remove('hidden');
-                return;
-            }
-
-            emptyListings.classList.add('hidden');
-            myListingsList.forEach(item => {
-                grid.appendChild(createListingCard(item));
-            });
-        }
-
-        // Item Detail Modal
-        function openItemModal(itemId) {
-            const item = listings.find(l => l.id === itemId);
-            if (!item) return;
-            currentModalItem = item;
-
-            const modalContent = document.getElementById('modal-content');
-            modalContent.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-                    <div class="rounded-xl overflow-hidden bg-gray-900 aspect-[4/3] relative">
-                        <img src="${item.image}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/23272A/5865F2?text=Margonem+Item'">
-                        <div class="absolute top-3 left-3 bg-[#111214]/80 text-indigo-400 font-bold text-xs px-3 py-1 rounded-lg">
-                            ${item.server} • Lvl ${item.level}
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-between space-y-4">
-                        <div>
-                            <div class="text-xs text-gray-400 mb-1">${item.category}</div>
-                            <h2 class="text-2xl font-extrabold text-white">${item.title}</h2>
-                            <p class="text-gray-300 text-sm mt-3 leading-relaxed">${item.description}</p>
-                        </div>
-
-                        <div class="space-y-3 bg-[#111214] p-4 rounded-xl border border-gray-800">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs text-gray-400 uppercase">Aktualna Cena:</span>
-                                <span class="text-xl font-extrabold text-[#57F287]">${item.highestBid} PLN</span>
-                            </div>
-                            <div class="flex items-center justify-between text-xs text-gray-400">
-                                <span>Prowadzący licytację:</span>
-                                <span class="text-white font-bold"><i class="fa-brands fa-discord text-[#5865F2] mr-1"></i>${item.highestBidder}</span>
-                            </div>
-                            <div class="flex items-center justify-between text-xs text-gray-400">
-                                <span>Sprzedający:</span>
-                                <span class="text-white font-bold flex items-center gap-1">
-                                    <i class="fa-solid fa-star text-yellow-400"></i> ${item.sellerRating} (${item.seller})
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between text-xs text-gray-400">
-                                <span>Koniec aukcji:</span>
-                                <span class="text-indigo-400 font-bold"><i class="fa-solid fa-clock mr-1"></i>${formatTimeLeft(item.endTime)}</span>
-                            </div>
-                        </div>
-
-                        <!-- Bidding action form -->
-                        <div class="space-y-3 pt-2">
-                            <div class="flex gap-2">
-                                <input type="number" id="bid-amount-input" min="${item.highestBid + 5}" placeholder="Min. ${item.highestBid + 5} PLN" class="flex-1 bg-[#111214] text-white px-4 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-[#5865F2] text-sm">
-                                <button onclick="placeBid('${item.id}')" class="bg-[#5865F2] hover:bg-indigo-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-[#5865F2]/20">
-                                    Zalicytuj
-                                </button>
-                            </div>
-                            ${item.buyNowPrice ? `
-                                <button onclick="buyNow('${item.id}')" class="w-full bg-gradient-to-r from-[#57F287] to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-gray-900 font-extrabold py-3 rounded-xl shadow-lg shadow-emerald-500/20 text-sm transition">
-                                    Kup Teraz za ${item.buyNowPrice} PLN
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('item-modal').classList.remove('hidden');
-            document.getElementById('item-modal').classList.add('flex');
-        }
-
-        function closeItemModal() {
-            document.getElementById('item-modal').classList.add('hidden');
-            document.getElementById('item-modal').classList.remove('flex');
-        }
-
-        // Place Bid Logic
-        function placeBid(itemId) {
-            if (!currentUser) {
-                showToast('Musisz zalogować się przez Discord, aby licytować!', 'error');
-                return;
-            }
-
-            const input = document.getElementById('bid-amount-input');
-            const bidVal = parseFloat(input.value);
-            const item = listings.find(l => l.id === itemId);
-
-            if (!bidVal || bidVal <= item.highestBid) {
-                showToast(`Oferta musi być wyższa niż obecna cena (${item.highestBid} PLN)!`, 'error');
-                return;
-            }
-
-            if (item.seller === currentUser.username) {
-                showToast('Nie możesz licytować własnego przedmiotu!', 'error');
-                return;
-            }
-
-            // Update item
-            item.highestBid = bidVal;
-            item.highestBidder = currentUser.username;
-            item.bidsCount = (item.bidsCount || 0) + 1;
-
-            localStorage.setItem('margo_listings', JSON.stringify(listings));
-
-            // Discord Bot Notification Simulation
-            addNotification(`🤖 [Discord Bot]: Gratulacje! Twoja oferta ${bidVal} PLN na "${item.title}" została przyjęta.`);
-
-            showToast('Złożono ofertę licytacji pomyślnie!', 'success');
-            closeItemModal();
-            filterListings();
-        }
-
-        // Buy Now Logic
-        function buyNow(itemId) {
-            if (!currentUser) {
-                showToast('Musisz zalogować się przez Discord, aby kupować!', 'error');
-                return;
-            }
-
-            const item = listings.find(l => l.id === itemId);
-            if (item.seller === currentUser.username) {
-                showToast('Nie możesz kupić własnego przedmiotu!', 'error');
-                return;
-            }
-
-            item.highestBid = item.buyNowPrice;
-            item.highestBidder = currentUser.username;
-            item.endTime = Date.now(); // End auction immediately
-
-            localStorage.setItem('margo_listings', JSON.stringify(listings));
-            addNotification(`🤖 [Discord Bot]: Sukces! Dokonano zakupu przedmiotu "${item.title}" w opcji Kup Teraz za ${item.buyNowPrice} PLN.`);
-
-            showToast(`Zakupiono przedmiot pomyślnie za ${item.buyNowPrice} PLN!`, 'success');
-            closeItemModal();
-            filterListings();
-        }
-
-        // Add Listing Modal
-        function openAddListingModal() {
-            if (!currentUser) {
-                showToast('Musisz zalogować się przez Discord, aby wystawiać przedmioty!', 'error');
-                return;
-            }
-            document.getElementById('add-modal').classList.remove('hidden');
-            document.getElementById('add-modal').classList.add('flex');
-        }
-
-        function closeAddListingModal() {
-            document.getElementById('add-modal').classList.add('hidden');
-            document.getElementById('add-modal').classList.remove('flex');
-        }
-
-        function handleCreateListing(e) {
-            e.preventDefault();
-            if (!currentUser) return;
-
-            const title = document.getElementById('new-title').value;
-            const category = document.getElementById('new-category').value;
-            const server = document.getElementById('new-server').value;
-            const price = parseFloat(document.getElementById('new-price').value);
-            const buyNow = document.getElementById('new-buynow').value ? parseFloat(document.getElementById('new-buynow').value) : null;
-            const level = parseInt(document.getElementById('new-level').value);
-            const image = document.getElementById('new-image').value;
-            const desc = document.getElementById('new-desc').value;
-
-            const newListing = {
-                id: 'item-' + Date.now(),
-                title,
-                category,
-                server,
-                level,
-                price,
-                buyNowPrice: buyNow,
-                highestBid: price,
-                highestBidder: 'Brak ofert',
-                seller: currentUser.username,
-                sellerRating: 5.0,
-                image,
-                description: desc,
-                endTime: Date.now() + 1000 * 60 * 60 * 24, // 24 hours
-                bidsCount: 0
+              id: data.id,
+              username: data.global_name || data.username,
+              tag: data.username,
+              avatar: avatarUrl
             };
 
-            listings.unshift(newListing);
-            localStorage.setItem('margo_listings', JSON.stringify(listings));
+            localStorage.setItem('margo_discord_user', JSON.stringify(currentUser));
+          }
+        } catch (err) {
+          console.error("Błąd autoryzacji Discord:", err);
+        }
+      }
+      renderAuthSection();
+      renderAuctions();
+    }
 
-            addNotification(`🤖 [Discord Bot]: Twoja oferta "${title}" została pomyślnie wystawiona na świecie ${server}!`);
+    // Aktualizacja paska nawigacji (Zalogowany / Niezalogowany)
+    function renderAuthSection() {
+      const container = document.getElementById('auth-section');
+      if (currentUser) {
+        container.innerHTML = `
+          <div class="flex items-center space-x-3 bg-slate-900/90 border border-slate-700 px-3 py-1.5 rounded-lg">
+            <img src="${currentUser.avatar}" alt="Avatar" class="w-8 h-8 rounded-full border border-emerald-500">
+            <div class="text-sm">
+              <div class="font-bold text-white leading-tight flex items-center gap-1">
+                ${currentUser.username}
+                <i class="fa-solid fa-circle-check text-emerald-400 text-xs" title="Zweryfikowany przez Discord"></i>
+              </div>
+              <div class="text-xs text-slate-400">@${currentUser.tag}</div>
+            </div>
+            <button onclick="logout()" class="text-slate-400 hover:text-red-400 ml-2 text-sm cursor-pointer" title="Wyloguj">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <button onclick="loginWithDiscord()" class="bg-[#5865F2] hover:bg-[#4752C4] text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition shadow-lg shadow-[#5865F2]/25 cursor-pointer">
+            <i class="fa-brands fa-discord"></i>
+            <span>Zaloguj przez Discord</span>
+          </button>
+        `;
+      }
+    }
 
-            showToast('Przedmiot został wystawiony na rynek!', 'success');
-            closeAddListingModal();
-            document.getElementById('add-listing-form').reset();
-            filterListings();
+    // Wyświetlanie kart aukcji
+    function renderAuctions() {
+      const grid = document.getElementById('auctions-grid');
+      const worldFilter = document.getElementById('filter-world').value;
+      const catFilter = document.getElementById('filter-category').value;
+
+      const filtered = auctions.filter(a => {
+        const matchWorld = worldFilter === 'all' || a.world === worldFilter;
+        const matchCat = catFilter === 'all' || a.category === catFilter;
+        return matchWorld && matchCat;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">Brak ofert spełniających kryteria.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        let badgeColor = "bg-amber-500/20 text-amber-400 border-amber-500/40";
+        let icon = "fa-ring";
+        if (item.category === "Konto") {
+          badgeColor = "bg-purple-500/20 text-purple-400 border-purple-500/40";
+          icon = "fa-user-shield";
+        } else if (item.category === "Złoto") {
+          badgeColor = "bg-yellow-500/20 text-yellow-300 border-yellow-500/40";
+          icon = "fa-coins";
         }
 
-        // Discord Notification Drawer Toggle
-        function toggleDiscordLog() {
-            const drawer = document.getElementById('discord-drawer');
-            drawer.classList.toggle('translate-x-full');
-            renderNotificationsList();
-        }
+        return `
+          <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between hover:border-amber-500/50 transition shadow-lg">
+            <div>
+              <div class="flex justify-between items-start mb-3">
+                <span class="text-xs font-semibold px-2.5 py-1 rounded border ${badgeColor} flex items-center gap-1.5">
+                  <i class="fa-solid ${icon}"></i> ${item.category}
+                </span>
+                <span class="text-xs bg-slate-900 text-slate-300 px-2.5 py-1 rounded border border-slate-700 font-medium">
+                  Świat: ${item.world}
+                </span>
+              </div>
 
-        function addNotification(text) {
-            notifications.unshift({
-                id: Date.now(),
-                text,
-                time: 'Przed chwilą',
-                unread: true
-            });
-            localStorage.setItem('margo_notifications', JSON.stringify(notifications));
-            updateNotificationBadge();
-        }
+              <h3 class="text-lg font-bold text-white mb-2">${item.title}</h3>
+              <p class="text-sm text-slate-400 mb-4">${item.desc}</p>
+            </div>
 
-        function updateNotificationBadge() {
-            const unreadCount = notifications.filter(n => n.unread).length;
-            const badge = document.getElementById('discord-badge-count');
-            badge.textContent = unreadCount;
-            if (unreadCount === 0) badge.classList.add('hidden');
-            else badge.classList.remove('hidden');
-        }
+            <div class="border-t border-slate-700/80 pt-4 mt-2">
+              <div class="flex justify-between items-end mb-3">
+                <div>
+                  <span class="text-xs text-slate-400 block">Aktualna oferta (${item.bidsCount}):</span>
+                  <span class="text-2xl font-extrabold text-amber-400">${item.currentBid} PLN</span>
+                  <span class="text-xs text-slate-500 block">Licytuje: ${item.lastBidder}</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-xs text-slate-400 block">Kup Teraz:</span>
+                  <span class="text-lg font-bold text-emerald-400">${item.buyNow} PLN</span>
+                </div>
+              </div>
 
-        function renderNotificationsList() {
-            const list = document.getElementById('discord-notifications-list');
-            list.innerHTML = '';
-            notifications.forEach(n => {
-                const item = document.createElement('div');
-                item.className = `p-3.5 rounded-xl border ${n.unread ? 'bg-[#5865F2]/10 border-[#5865F2]/40' : 'bg-[#111214] border-gray-800'} text-xs space-y-1`;
-                item.innerHTML = `
-                    <div class="text-gray-200 font-medium leading-relaxed">${n.text}</div>
-                    <div class="text-[10px] text-gray-500">${n.time}</div>
-                `;
-                list.appendChild(item);
-            });
-            // Mark as read
-            notifications.forEach(n => n.unread = false);
-            localStorage.setItem('margo_notifications', JSON.stringify(notifications));
-            updateNotificationBadge();
-        }
+              <div class="flex gap-2">
+                <button onclick="placeBid(${item.id})" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 rounded-lg text-sm transition cursor-pointer">
+                  Podbij (+10 PLN)
+                </button>
+                <button onclick="buyNow(${item.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition cursor-pointer">
+                  Kup Teraz
+                </button>
+              </div>
 
-        function clearNotifications() {
-            notifications = [];
-            localStorage.setItem('margo_notifications', JSON.stringify(notifications));
-            renderNotificationsList();
-            updateNotificationBadge();
-        }
+              <div class="mt-3 text-xs text-slate-500 flex justify-between items-center">
+                <span>Wystawił: <strong class="text-slate-300">${item.seller}</strong></span>
+                <span class="text-emerald-400 flex items-center gap-1"><i class="fa-brands fa-discord"></i> Zweryfikowany</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
 
-        // Toast Notification System
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            let bgClass = type === 'success' ? 'bg-[#57F287] text-gray-900' : 'bg-[#ED4245] text-white';
-            if (type === 'info') bgClass = 'bg-[#5865F2] text-white';
+    // Licytowanie
+    function placeBid(id) {
+      if (!currentUser) {
+        alert("Musisz zalogować się przez Discord, aby brać udział w licytacji!");
+        return;
+      }
+      const item = auctions.find(a => a.id === id);
+      if (item) {
+        item.currentBid += 10;
+        item.bidsCount += 1;
+        item.lastBidder = currentUser.username;
+        localStorage.setItem('margoplaats_auctions', JSON.stringify(auctions));
+        renderAuctions();
+      }
+    }
 
-            toast.className = `pointer-events-auto px-4 py-3 rounded-xl font-bold text-sm shadow-xl flex items-center gap-3 transform translate-y-2 opacity-0 transition-all duration-300 ${bgClass}`;
-            toast.innerHTML = `
-                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'} text-lg"></i>
-                <span>${message}</span>
-            `;
+    // Kup Teraz
+    function buyNow(id) {
+      if (!currentUser) {
+        alert("Musisz zalogować się przez Discord, aby kupić przedmiot!");
+        return;
+      }
+      const item = auctions.find(a => a.id === id);
+      if (item && confirm(`Czy na pewno chcesz kupić "${item.title}" za ${item.buyNow} PLN?`)) {
+        alert(`Gratulacje ${currentUser.username}! Kupiłeś przedmiot. Skontaktuj się ze sprzedawcą (${item.seller}) na Discordzie.`);
+        auctions = auctions.filter(a => a.id !== id);
+        localStorage.setItem('margoplaats_auctions', JSON.stringify(auctions));
+        renderAuctions();
+      }
+    }
 
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
+    // Obsługa modala dodawania
+    function openAddModal() {
+      if (!currentUser) {
+        alert("Zaloguj się przez Discord, aby wystawić przedmiot!");
+        return;
+      }
+      document.getElementById('add-modal').classList.remove('hidden');
+      document.getElementById('add-modal').classList.add('flex');
+    }
 
-            setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
+    function closeAddModal() {
+      document.getElementById('add-modal').classList.add('hidden');
+      document.getElementById('add-modal').classList.remove('flex');
+    }
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
-    </script>
+    function addAuction(e) {
+      e.preventDefault();
+      const newAuction = {
+        id: Date.now(),
+        title: document.getElementById('item-title').value,
+        category: document.getElementById('item-category').value,
+        world: document.getElementById('item-world').value,
+        currentBid: Number(document.getElementById('item-price').value),
+        buyNow: Number(document.getElementById('item-buynow').value),
+        desc: document.getElementById('item-desc').value || "Brak dodatkowego opisu.",
+        seller: currentUser.username,
+        lastBidder: "Brak ofert",
+        bidsCount: 0
+      };
+
+      auctions.unshift(newAuction);
+      localStorage.setItem('margoplaats_auctions', JSON.stringify(auctions));
+      closeAddModal();
+      e.target.reset();
+      renderAuctions();
+    }
+
+    window.addEventListener('DOMContentLoaded', checkDiscordCallback);
+  </script>
 </body>
 </html>
