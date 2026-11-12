@@ -11,7 +11,7 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
 
   <!-- Pasek nawigacji -->
-  <nav class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40">
+  <nav class="bg-slate-900/95 backdrop-blur border-b border-slate-800 sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="flex items-center space-x-3">
         <div class="bg-amber-500/20 border border-amber-500/50 p-2 rounded-lg text-amber-400">
@@ -26,7 +26,7 @@
       </div>
 
       <div class="flex items-center gap-2 sm:gap-3">
-        <button onclick="fetchAuctions()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-2 rounded-lg transition cursor-pointer flex items-center gap-1.5" title="Odśwież listę aukcji">
+        <button onclick="fetchAuctions()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-2 rounded-lg transition cursor-pointer flex items-center gap-1.5" title="Odśwież listę">
           <i class="fa-solid fa-rotate"></i>
           <span class="hidden md:inline">Odśwież</span>
         </button>
@@ -40,30 +40,45 @@
   </nav>
 
   <!-- Główna zawartość -->
-  <main class="max-w-6xl mx-auto px-4 py-8">
+  <main class="max-w-6xl mx-auto px-4 py-6">
     
     <!-- Panel filtrów i wyszukiwarki -->
     <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-lg mb-6 space-y-4">
       
-      <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
-        <div class="flex flex-wrap gap-2" id="category-tabs">
-          <button onclick="setCategory('all')" data-cat="all" class="cat-btn bg-amber-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2">
-            <i class="fa-solid fa-layer-group"></i> Wszystkie
-          </button>
-          <button onclick="setCategory('Przedmioty')" data-cat="Przedmioty" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2">
-            <i class="fa-solid fa-shield-halved text-amber-400"></i> Przedmioty
-          </button>
-          <button onclick="setCategory('Konta')" data-cat="Konta" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2">
-            <i class="fa-solid fa-user-ninja text-purple-400"></i> Konta
-          </button>
-          <button onclick="setCategory('Złoto')" data-cat="Złoto" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2">
-            <i class="fa-solid fa-coins text-yellow-400"></i> Złoto
-          </button>
+      <!-- Górny rząd: Przełącznik SELL / BUY + Zakładki kategorii + Wystawianie -->
+      <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-3">
+        
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Typ ogłoszenia (Sprzedaż / Kupno jak na Discordzie) -->
+          <div class="flex bg-slate-950 p-1 rounded-lg border border-slate-800 mr-1">
+            <button onclick="setTradeType('all')" data-trade="all" class="trade-btn bg-slate-800 text-white font-bold px-3 py-1.5 rounded-md text-xs transition cursor-pointer">Wszystko</button>
+            <button onclick="setTradeType('SELL')" data-trade="SELL" class="trade-btn text-emerald-400 hover:bg-slate-900 font-bold px-3 py-1.5 rounded-md text-xs transition cursor-pointer">💸 Sprzedaż</button>
+            <button onclick="setTradeType('BUY')" data-trade="BUY" class="trade-btn text-amber-400 hover:bg-slate-900 font-bold px-3 py-1.5 rounded-md text-xs transition cursor-pointer">💰 Kupno</button>
+          </div>
+
+          <!-- Zakładki kategorii -->
+          <div class="flex flex-wrap gap-1.5" id="category-tabs">
+            <button onclick="setCategory('all')" data-cat="all" class="cat-btn bg-amber-500 text-slate-950 font-bold px-3.5 py-2 rounded-lg text-xs sm:text-sm transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-layer-group"></i> Wszystkie
+            </button>
+            <button onclick="setCategory('Przedmioty')" data-cat="Przedmioty" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-3.5 py-2 rounded-lg text-xs sm:text-sm transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved text-amber-400"></i> Przedmioty
+            </button>
+            <button onclick="setCategory('Konta')" data-cat="Konta" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-3.5 py-2 rounded-lg text-xs sm:text-sm transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-user-ninja text-purple-400"></i> Konta
+            </button>
+            <button onclick="setCategory('Złoto')" data-cat="Złoto" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-3.5 py-2 rounded-lg text-xs sm:text-sm transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-coins text-yellow-400"></i> Złoto
+            </button>
+            <button onclick="setCategory('Inne')" data-cat="Inne" class="cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-3.5 py-2 rounded-lg text-xs sm:text-sm transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-box-archive text-sky-400"></i> Inne
+            </button>
+          </div>
         </div>
 
-        <button onclick="openAddModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2 rounded-lg transition flex items-center justify-center space-x-2 cursor-pointer shadow-lg shadow-amber-500/20">
+        <button onclick="openAddModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-lg transition flex items-center justify-center space-x-2 cursor-pointer shadow-lg shadow-amber-500/20">
           <i class="fa-solid fa-plus"></i>
-          <span>Wystaw ofertę</span>
+          <span>Wystaw ofertę / depozyt</span>
         </button>
       </div>
 
@@ -71,7 +86,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-3 border-t border-slate-800/80">
         <div class="relative lg:col-span-2">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-sm"></i>
-          <input type="text" id="filter-search" oninput="renderAuctions()" placeholder="Szukaj przedmiotu, profesji, opisu..." class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+          <input type="text" id="filter-search" oninput="renderAuctions()" placeholder="Szukaj itemu, numeru z depozytu, profesji, +5..." class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
         </div>
 
         <div class="flex items-center gap-2">
@@ -83,14 +98,15 @@
         <div>
           <select id="filter-world" onchange="renderAuctions()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
             <option value="all">🌍 Wszystkie światy</option>
+            <option value="Publik">🔥 Publik (Wiele światów)</option>
             <optgroup label="Światy Zwykłe">
               <option value="Katahha">Katahha</option>
+              <option value="Lelwani">Lelwani</option>
+              <option value="Jaruna">Jaruna</option>
               <option value="Tarhuna">Tarhuna</option>
               <option value="Aldous">Aldous</option>
               <option value="Gefion">Gefion</option>
               <option value="Hutena">Hutena</option>
-              <option value="Jaruna">Jaruna</option>
-              <option value="Lelwani">Lelwani</option>
               <option value="Majuna">Majuna</option>
               <option value="Nomada">Nomada</option>
               <option value="Perkun">Perkun</option>
@@ -99,12 +115,14 @@
               <option value="Zemyna">Zemyna</option>
               <option value="Zorza">Zorza</option>
             </optgroup>
-            <optgroup label="Światy Prywatne / Inne">
+            <optgroup label="Światy Specjalne / Prywatne">
+              <option value="Gordion">⭐ Gordion</option>
+              <option value="Luvia">💎 Luvia</option>
+              <option value="Pandora">Pandora</option>
+              <option value="Unia">Unia</option>
               <option value="Nubes">Nubes</option>
               <option value="Thantos">Thantos</option>
               <option value="Syberia">Syberia</option>
-              <option value="Unia">Unia</option>
-              <option value="Pandora">Pandora</option>
             </optgroup>
           </select>
         </div>
@@ -129,47 +147,51 @@
 
   </main>
 
-  <!-- Modal dodawania aukcji -->
-  <div id="add-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-lg w-full p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+  <!-- ULEPSZONY MODAL WYSTAWIANIA PRZEDMIOTÓW / DEPOZYTÓW -->
+  <div id="add-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-xl w-full p-6 shadow-2xl max-h-[94vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-amber-400">Wystaw na giełdę</h3>
+        <h3 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Kreator ogłoszenia Margonem
+        </h3>
         <button onclick="closeAddModal()" class="text-slate-400 hover:text-white cursor-pointer">
           <i class="fa-solid fa-xmark text-xl"></i>
         </button>
       </div>
 
       <form onsubmit="addAuction(event)" class="space-y-4">
-        <div class="grid grid-cols-3 gap-3">
-          <div class="col-span-2">
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Nazwa przedmiotu / konta / pakietu</label>
-            <input type="text" id="item-title" required placeholder="np. Pierścień Mocy / Wojownik" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
-          </div>
+        
+        <!-- Przełącznik Sprzedam / Kupię + Kategoria + Świat -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Poziom (LVL)</label>
-            <input type="number" id="item-lvl" min="1" max="500" placeholder="np. 120" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-400 font-bold text-sm focus:outline-none focus:border-amber-500">
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Typ ogłoszenia</label>
+            <select id="item-trade-type" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-emerald-400 font-bold text-sm focus:outline-none focus:border-amber-500">
+              <option value="SELL">💸 SPRZEDAM (SELL)</option>
+              <option value="BUY">💰 KUPIĘ (BUY)</option>
+            </select>
           </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Kategoria</label>
-            <select id="item-category" onchange="toggleAccountLinkField()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
-              <option value="Przedmioty">Przedmioty (Leg/Hero)</option>
+            <select id="item-category" onchange="toggleFormFieldsByCategory()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+              <option value="Przedmioty">Przedmioty / Depozyt</option>
               <option value="Konta">Konto / Postać</option>
               <option value="Złoto">Złoto (k / m / g)</option>
+              <option value="Inne">Inne (Zastępstwa / Usługi)</option>
             </select>
           </div>
           <div>
             <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Świat</label>
             <select id="item-world" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
               <option value="Katahha">Katahha</option>
+              <option value="Lelwani">Lelwani</option>
+              <option value="Jaruna">Jaruna</option>
+              <option value="Gordion">⭐ Gordion</option>
+              <option value="Luvia">💎 Luvia</option>
+              <option value="Publik">🔥 Publik (Wiele światów)</option>
               <option value="Tarhuna">Tarhuna</option>
               <option value="Aldous">Aldous</option>
               <option value="Gefion">Gefion</option>
               <option value="Hutena">Hutena</option>
-              <option value="Jaruna">Jaruna</option>
-              <option value="Lelwani">Lelwani</option>
               <option value="Majuna">Majuna</option>
               <option value="Nomada">Nomada</option>
               <option value="Perkun">Perkun</option>
@@ -183,6 +205,58 @@
           </div>
         </div>
 
+        <!-- Nazwa i Poziom -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="col-span-2">
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Tytuł oferty / Opis skrócony</label>
+            <input type="text" id="item-title" required placeholder="np. Publik po lewej na +5 / Lelwani legi / Pierścień 120" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Poziom (LVL)</label>
+            <input type="number" id="item-lvl" min="1" max="500" placeholder="np. 120" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-400 font-bold text-sm focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+        <!-- Specjalne parametry dla Przedmiotów (Rzadkość, Ulepszenie +5, Profesje) -->
+        <div id="item-specific-fields" class="bg-slate-950/90 border border-amber-500/30 rounded-xl p-3.5 space-y-3">
+          <div class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-gem"></i> Detale Przedmiotu / Ekwipunku
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Rzadkość</label>
+              <select id="item-rarity" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-amber-400 font-bold text-xs focus:outline-none">
+                <option value="Legenda">🟧 Legendarny</option>
+                <option value="Paczka Legend">📦 Paczka / Depozyt Legend</option>
+                <option value="Heroik">🟦 Heroiczny</option>
+                <option value="Unikat">🟨 Unikatowy</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400 mb-1">Ulepszenie</label>
+              <select id="item-upgrade" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-emerald-400 font-bold text-xs focus:outline-none">
+                <option value="">Brak / Różne</option>
+                <option value="+5">🔥 +5 (Max)</option>
+                <option value="+4">+4</option>
+                <option value="+3">+3</option>
+                <option value="+2">+2</option>
+                <option value="+1">+1</option>
+              </select>
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="block text-[11px] text-slate-400 mb-1">Profesje</label>
+              <div class="flex gap-1 pt-0.5" id="prof-selector">
+                <button type="button" onclick="toggleProf(this, 'w')" class="prof-chip bg-slate-900 border border-slate-700 text-slate-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">W</button>
+                <button type="button" onclick="toggleProf(this, 'p')" class="prof-chip bg-slate-900 border border-slate-700 text-slate-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">P</button>
+                <button type="button" onclick="toggleProf(this, 'b')" class="prof-chip bg-slate-900 border border-slate-700 text-slate-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">B</button>
+                <button type="button" onclick="toggleProf(this, 'm')" class="prof-chip bg-slate-900 border border-slate-700 text-slate-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">M</button>
+                <button type="button" onclick="toggleProf(this, 't')" class="prof-chip bg-slate-900 border border-slate-700 text-slate-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">T</button>
+                <button type="button" onclick="toggleProf(this, 'h')" class="prof-chip bg-slate-900 border border-slate-700 text-slate-300 px-2 py-1 rounded text-xs font-bold cursor-pointer">H</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Pole linku do profilu (widoczne tylko dla Konta) -->
         <div id="account-link-wrapper" class="hidden">
           <label class="block text-xs uppercase tracking-wider text-purple-400 font-semibold mb-1">
@@ -191,49 +265,62 @@
           <input type="url" id="item-profile-url" placeholder="https://www.margonem.pl/profile/view,..." class="w-full bg-slate-950 border border-purple-500/50 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-400">
         </div>
 
+        <!-- STREFA WKLEJANIA SCREENÓW (CTRL+V LUB PRZECIĄGNIJ I UPUŚĆ) -->
+        <div class="space-y-2">
+          <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold">
+            📸 Zdjęcia / Screeny ekwipunku (Wciśnij CTRL+V aby wkleić wycinek lub wybierz plik!)
+          </label>
+          <div id="paste-dropzone" tabindex="0" onclick="document.getElementById('file-upload-input').click()" class="border-2 border-dashed border-amber-500/50 hover:border-amber-400 bg-slate-950/90 rounded-xl p-4 text-center cursor-pointer transition focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <input type="file" id="file-upload-input" multiple accept="image/*" onchange="handleFilesSelected(event)" class="hidden">
+            <i class="fa-solid fa-paste text-2xl text-amber-400 mb-1.5 block"></i>
+            <div class="text-sm font-bold text-white">Wciśnij <span class="bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded text-xs">Ctrl + V</span> gdziekolwiek w oknie, aby wkleić wycinek ze schowka</div>
+            <div class="text-xs text-slate-400 mt-1">lub kliknij tutaj, aby wybrać screeny z komputera / telefonu</div>
+          </div>
+
+          <!-- Podgląd wklejonych zdjęć -->
+          <div id="pasted-images-preview" class="flex flex-wrap gap-2 pt-1"></div>
+
+          <!-- Opcjonalne linki zewnętrzne -->
+          <input type="text" id="item-imgs" placeholder="Opcjonalnie: możesz też wkleić bezpośrednie linki URL do zdjęć (po przecinku)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-white text-xs focus:outline-none focus:border-amber-500">
+        </div>
+
         <!-- Wybór typu sprzedaży i waluty -->
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Typ oferty</label>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Tryb wyceny</label>
             <select id="item-sale-type" onchange="toggleSaleTypeFields()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
               <option value="both">Licytacja + Kup Teraz</option>
-              <option value="buynow">Tylko Kup Teraz (bez licytacji)</option>
+              <option value="buynow">Tylko Kup Teraz (stała cena)</option>
               <option value="auction">Tylko Licytacja</option>
+              <option value="offers">Zbieram oferty / Paczka (CW/KT w opisie)</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Waluta</label>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Waluta rozliczenia</label>
             <select id="item-currency" onchange="updatePriceHints()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-amber-400 font-bold text-sm focus:outline-none focus:border-amber-500">
-              <option value="PLN">PLN (zł)</option>
+              <option value="PLN">PLN (BLIK / Przelew)</option>
               <option value="GOLD">Złoto w grze (1k / 1m / 1g)</option>
             </select>
           </div>
         </div>
 
-        <!-- Pola kwotowe z automatycznym formatowaniem 1k / 1m / 1g -->
-        <div class="grid grid-cols-2 gap-3">
+        <!-- Pola kwotowe -->
+        <div id="price-fields-grid" class="grid grid-cols-2 gap-3">
           <div id="start-price-wrapper">
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Cena wywoławcza</label>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Cena wywoławcza (CW)</label>
             <input type="text" id="item-price" oninput="previewFormattedAmount('item-price', 'price-preview')" placeholder="np. 50 lub 150m" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
             <span id="price-preview" class="text-[11px] text-amber-400 font-semibold block mt-1"></span>
           </div>
           <div id="buynow-price-wrapper">
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Cena Kup Teraz</label>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Cena Kup Teraz (KT)</label>
             <input type="text" id="item-buynow" oninput="previewFormattedAmount('item-buynow', 'buynow-preview')" placeholder="np. 120 lub 1.5g" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500">
             <span id="buynow-preview" class="text-[11px] text-emerald-400 font-semibold block mt-1"></span>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">
-            Linki do zdjęć / screenów (kilka linków oddziel przecinkiem lub nową linią)
-          </label>
-          <textarea id="item-imgs" rows="2" placeholder="https://i.imgur.com/screen1.png&#10;https://i.imgur.com/screen2.png" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-amber-500"></textarea>
-        </div>
-
-        <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Opis / Płatność</label>
-          <textarea id="item-desc" rows="2" placeholder="np. Czysty, płatność BLIK, możliwy zaufany handlarz." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500"></textarea>
+          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Opis / Rozpiska numerków ze screena / Płatność</label>
+          <textarea id="item-desc" rows="2" placeholder="np. Publik po lewej na +5, numery 561-671 proszę pytać o KT na priv. Płatność BLIK." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500"></textarea>
         </div>
 
         <label class="flex items-center gap-2.5 bg-slate-950 border border-slate-800 p-3 rounded-lg cursor-pointer">
@@ -242,7 +329,7 @@
         </label>
 
         <button type="submit" id="submit-btn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg transition cursor-pointer">
-          Opublikuj ofertę
+          Opublikuj ogłoszenie
         </button>
       </form>
     </div>
@@ -253,7 +340,7 @@
     <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-bold text-emerald-400 flex items-center gap-2">
-          <i class="fa-solid fa-handshake"></i> Finalizacja zakupu i Kontakt
+          <i class="fa-solid fa-handshake"></i> Kontakt i Finalizacja Transakcji
         </h3>
         <button onclick="closeBuyModal()" class="text-slate-400 hover:text-white cursor-pointer">
           <i class="fa-solid fa-xmark text-xl"></i>
@@ -263,9 +350,9 @@
     </div>
   </div>
 
-  <!-- Modal podglądu pełnego zdjęcia -->
-  <div id="lightbox-modal" onclick="closeLightbox()" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-50 p-4 cursor-zoom-out">
-    <img id="lightbox-img" src="" class="max-w-full max-h-[90vh] rounded-lg border border-slate-700 shadow-2xl">
+  <!-- Modal podglądu pełnego zdjęcia (Powiększenie siatki itemów) -->
+  <div id="lightbox-modal" onclick="closeLightbox()" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-50 p-4 cursor-zoom-out">
+    <img id="lightbox-img" src="" class="max-w-full max-h-[94vh] rounded-lg border-2 border-amber-500/60 shadow-2xl">
   </div>
 
   <!-- Modal konfiguracji Webhooka Discord i Handlarza -->
@@ -314,11 +401,96 @@
 
     let currentUser = JSON.parse(localStorage.getItem('margo_discord_user')) || null;
     let activeCategory = 'all';
+    let activeTradeType = 'all';
     let auctions = [];
     let slideIndexMap = {};
 
+    // Tablica przechowująca wklejone screeny (Ctrl+V) oraz wybrane profesje
+    let pastedImagesData = [];
+    let selectedProfs = [];
+
     // ==========================================
-    // 2. PRZELICZNIK ZŁOTA (1000 -> 1k, 1000000 -> 1m, 1000000000 -> 1g)
+    // 2. WKLEJANIE SCREENÓW ZE SCHOWKA (CTRL+V) I KOMPRESJA
+    // ==========================================
+    function compressAndAddImage(file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 1000;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+            else { w = Math.round(w * (maxDim / h)); h = maxDim; }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          pastedImagesData.push(dataUrl);
+          renderPastedImagesPreview();
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    window.addEventListener('paste', (e) => {
+      const modal = document.getElementById('add-modal');
+      if (modal.classList.contains('hidden')) return;
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      for (const item of items) {
+        if (item.type.indexOf('image') === 0) {
+          const blob = item.getAsFile();
+          compressAndAddImage(blob);
+        }
+      }
+    });
+
+    function handleFilesSelected(e) {
+      const files = Array.from(e.target.files || []);
+      files.forEach(file => {
+        if (file.type.startsWith('image/')) compressAndAddImage(file);
+      });
+      e.target.value = '';
+    }
+
+    function removePastedImage(idx) {
+      pastedImagesData.splice(idx, 1);
+      renderPastedImagesPreview();
+    }
+
+    function renderPastedImagesPreview() {
+      const container = document.getElementById('pasted-images-preview');
+      if (pastedImagesData.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+      container.innerHTML = pastedImagesData.map((src, i) => `
+        <div class="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-amber-500 shadow">
+          <img src="${src}" class="w-full h-full object-cover">
+          <button type="button" onclick="removePastedImage(${i})" class="absolute top-0.5 right-0.5 bg-red-600 text-white w-5 h-5 rounded-full text-xs flex items-center justify-center cursor-pointer">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function toggleProf(btn, prof) {
+      if (selectedProfs.includes(prof)) {
+        selectedProfs = selectedProfs.filter(p => p !== prof);
+        btn.className = "prof-chip bg-slate-900 border border-slate-700 text-slate-300 px-2 py-1 rounded text-xs font-bold cursor-pointer";
+      } else {
+        selectedProfs.push(prof);
+        btn.className = "prof-chip bg-amber-500 text-slate-950 border border-amber-400 px-2 py-1 rounded text-xs font-bold cursor-pointer";
+      }
+    }
+
+    // ==========================================
+    // 3. PRZELICZNIK ZŁOTA (1k, 1m, 1g)
     // ==========================================
     function parseAmountInput(rawStr, currency) {
       if (!rawStr) return 0;
@@ -326,16 +498,9 @@
       if (currency === 'PLN') return parseFloat(str) || 0;
 
       let multiplier = 1;
-      if (str.endsWith('k')) {
-        multiplier = 1000;
-        str = str.slice(0, -1);
-      } else if (str.endsWith('m')) {
-        multiplier = 1000000;
-        str = str.slice(0, -1);
-      } else if (str.endsWith('g')) {
-        multiplier = 1000000000;
-        str = str.slice(0, -1);
-      }
+      if (str.endsWith('k')) { multiplier = 1000; str = str.slice(0, -1); }
+      else if (str.endsWith('m')) { multiplier = 1000000; str = str.slice(0, -1); }
+      else if (str.endsWith('g')) { multiplier = 1000000000; str = str.slice(0, -1); }
       const val = parseFloat(str);
       return isNaN(val) ? 0 : Math.round(val * multiplier);
     }
@@ -343,13 +508,10 @@
     function formatPrice(num, currency) {
       const n = Number(num) || 0;
       if (currency === 'PLN') return `${n} PLN`;
-
-      // Obsługa starych aukcji zapisanych w k/m/g
       if (currency === 'k') return `${n}k`;
       if (currency === 'm') return `${n}m`;
       if (currency === 'g') return `${n}g`;
 
-      // Nowy automatyczny przelicznik: 1000 -> 1k, 1000000 -> 1m, 1000000000 -> 1g
       if (n >= 1000000000) return parseFloat((n / 1000000000).toFixed(2)) + 'g';
       if (n >= 1000000) return parseFloat((n / 1000000).toFixed(2)) + 'm';
       if (n >= 1000) return parseFloat((n / 1000).toFixed(2)) + 'k';
@@ -361,10 +523,7 @@
       const raw = document.getElementById(inputId).value;
       const parsed = parseAmountInput(raw, curr);
       const previewEl = document.getElementById(previewId);
-      if (!raw || parsed <= 0) {
-        previewEl.innerText = "";
-        return;
-      }
+      if (!raw || parsed <= 0) { previewEl.innerText = ""; return; }
       previewEl.innerText = `Wyświetli się jako: ${formatPrice(parsed, curr)}`;
     }
 
@@ -373,35 +532,29 @@
       previewFormattedAmount('item-buynow', 'buynow-preview');
     }
 
-    function toggleAccountLinkField() {
+    function toggleFormFieldsByCategory() {
       const cat = document.getElementById('item-category').value;
-      const wrapper = document.getElementById('account-link-wrapper');
-      if (cat === 'Konta') {
-        wrapper.classList.remove('hidden');
-      } else {
-        wrapper.classList.add('hidden');
-      }
+      document.getElementById('account-link-wrapper').classList.toggle('hidden', cat !== 'Konta');
+      document.getElementById('item-specific-fields').classList.toggle('hidden', cat !== 'Przedmioty');
     }
 
     function toggleSaleTypeFields() {
       const saleType = document.getElementById('item-sale-type').value;
       const startWrap = document.getElementById('start-price-wrapper');
       const buyNowWrap = document.getElementById('buynow-price-wrapper');
+      const gridWrap = document.getElementById('price-fields-grid');
 
-      if (saleType === 'buynow') {
-        startWrap.classList.add('hidden');
-        buyNowWrap.classList.remove('hidden');
-      } else if (saleType === 'auction') {
-        startWrap.classList.remove('hidden');
-        buyNowWrap.classList.add('hidden');
+      if (saleType === 'offers') {
+        gridWrap.classList.add('hidden');
       } else {
-        startWrap.classList.remove('hidden');
-        buyNowWrap.classList.remove('hidden');
+        gridWrap.classList.remove('hidden');
+        startWrap.classList.toggle('hidden', saleType === 'buynow');
+        buyNowWrap.classList.toggle('hidden', saleType === 'auction');
       }
     }
 
     // ==========================================
-    // 3. LOGOWANIE DISCORD OAUTH2
+    // 4. LOGOWANIE DISCORD OAUTH2
     // ==========================================
     function loginWithDiscord() {
       const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
@@ -481,7 +634,7 @@
     }
 
     // ==========================================
-    // 4. ODCZYT METADANYCH AUKCJI
+    // 5. ODCZYT METADANYCH AUKCJI
     // ==========================================
     function parseAuctionMeta(item) {
       let rawDesc = item.description || item.desc || "";
@@ -491,6 +644,10 @@
         discordId: "",
         middleman: true,
         saleType: "both",
+        tradeType: "SELL",
+        rarity: "Legenda",
+        upgrade: "",
+        profs: [],
         profileUrl: ""
       };
 
@@ -522,7 +679,7 @@
     }
 
     // ==========================================
-    // 5. POBIERANIE I WYŚWIETLANIE AUKCJI
+    // 6. POBIERANIE I WYŚWIETLANIE OFERT (STYL DISCORD / MARGO)
     // ==========================================
     async function fetchAuctions() {
       const { data, error } = await supabaseClient
@@ -550,13 +707,25 @@
       setInterval(fetchAuctions, 10000);
     }
 
+    function setTradeType(t) {
+      activeTradeType = t;
+      document.querySelectorAll('.trade-btn').forEach(btn => {
+        if (btn.dataset.trade === t) {
+          btn.classList.add('bg-slate-800', 'ring-1', 'ring-amber-500/50');
+        } else {
+          btn.classList.remove('bg-slate-800', 'ring-1', 'ring-amber-500/50');
+        }
+      });
+      renderAuctions();
+    }
+
     function setCategory(cat) {
       activeCategory = cat;
       document.querySelectorAll('.cat-btn').forEach(btn => {
         if (btn.dataset.cat === cat) {
-          btn.className = "cat-btn bg-amber-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2";
+          btn.className = "cat-btn bg-amber-500 text-slate-950 font-bold px-3.5 py-2 rounded-lg text-xs sm:text-sm transition cursor-pointer flex items-center gap-1.5";
         } else {
-          btn.className = "cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg text-sm transition cursor-pointer flex items-center gap-2";
+          btn.className = "cat-btn bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-3.5 py-2 rounded-lg text-xs sm:text-sm transition cursor-pointer flex items-center gap-1.5";
         }
       });
       renderAuctions();
@@ -591,10 +760,13 @@
         const { cleanDesc, meta } = parseAuctionMeta(a);
         const matchWorld = worldFilter === 'all' || a.world === worldFilter;
         const matchCat = activeCategory === 'all' || a.category === activeCategory;
+        const matchTrade = activeTradeType === 'all' || (meta.tradeType || 'SELL') === activeTradeType;
         
         const isGold = a.currency !== 'PLN';
         const matchCurr = currencyFilter === 'all' || (currencyFilter === 'PLN' && !isGold) || (currencyFilter === 'GOLD' && isGold);
-        const matchSearch = !searchQuery || a.title.toLowerCase().includes(searchQuery) || cleanDesc.toLowerCase().includes(searchQuery);
+        
+        const searchableText = `${a.title} ${cleanDesc} ${meta.upgrade || ''} ${(meta.profs || []).join(' ')}`.toLowerCase();
+        const matchSearch = !searchQuery || searchableText.includes(searchQuery);
         
         let matchLvl = true;
         if (minLvl > 0 || maxLvl < 9999) {
@@ -602,14 +774,14 @@
           matchLvl = itemLvl >= minLvl && itemLvl <= maxLvl;
         }
 
-        return matchWorld && matchCat && matchCurr && matchSearch && matchLvl;
+        return matchWorld && matchCat && matchTrade && matchCurr && matchSearch && matchLvl;
       });
 
       if (filtered.length === 0) {
         grid.innerHTML = `
           <div class="col-span-full bg-slate-900/50 border border-slate-800 rounded-xl text-center py-12 text-slate-400">
             <i class="fa-solid fa-box-open text-3xl mb-2 text-slate-600 block"></i>
-            Brak aktywnych ofert dla wybranych filtrów.
+            Brak aktywnych ogłoszeń dla wybranych filtrów.
           </div>`;
         return;
       }
@@ -617,44 +789,52 @@
       grid.innerHTML = filtered.map(item => {
         const { cleanDesc, meta, images } = parseAuctionMeta(item);
         const saleType = meta.saleType || 'both';
+        const tradeType = meta.tradeType || 'SELL';
 
-        let badgeColor = "bg-amber-500/20 text-amber-400 border-amber-500/40";
-        let icon = "fa-shield-halved";
-        if (item.category === "Konta") {
-          badgeColor = "bg-purple-500/20 text-purple-400 border-purple-500/40";
-          icon = "fa-user-ninja";
-        } else if (item.category === "Złoto") {
-          badgeColor = "bg-yellow-500/20 text-yellow-300 border-yellow-500/40";
-          icon = "fa-coins";
-        }
+        const tradeBadge = tradeType === 'BUY'
+          ? `<span class="text-[11px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded">💰 KUPIĘ</span>`
+          : `<span class="text-[11px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded">💸 SPRZEDAM</span>`;
 
+        // Zielony znacznik ulepszenia +5 jak w Margonem
+        const upgradeBadge = meta.upgrade
+          ? `<span class="text-xs font-extrabold bg-emerald-950 text-emerald-400 border border-emerald-500/60 px-2 py-0.5 rounded shadow">${meta.upgrade}</span>`
+          : '';
+
+        const profsBadge = (meta.profs && meta.profs.length > 0)
+          ? `<span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded uppercase font-bold">${meta.profs.join('/')}</span>`
+          : '';
+
+        const lvlBadge = meta.lvl
+          ? `<span class="text-xs bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-bold">${meta.lvl} lvl</span>`
+          : '';
+
+        // Galeria z wyraźną pomarańczową ramką legendy i lupką do powiększania całych depozytów
         let galleryHtml = '';
         if (images.length > 0) {
           const currentIndex = (slideIndexMap[item.id] || 0) % images.length;
           const currentImg = images[currentIndex];
           const navBtns = images.length > 1 ? `
-            <button onclick="changeSlide(${item.id}, -1, ${images.length})" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-black text-white w-7 h-7 rounded-full flex items-center justify-center text-xs cursor-pointer">
+            <button onclick="changeSlide(${item.id}, -1, ${images.length})" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/80 hover:bg-black text-white w-7 h-7 rounded-full flex items-center justify-center text-xs cursor-pointer">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <button onclick="changeSlide(${item.id}, 1, ${images.length})" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-black text-white w-7 h-7 rounded-full flex items-center justify-center text-xs cursor-pointer">
+            <button onclick="changeSlide(${item.id}, 1, ${images.length})" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/80 hover:bg-black text-white w-7 h-7 rounded-full flex items-center justify-center text-xs cursor-pointer">
               <i class="fa-solid fa-chevron-right"></i>
             </button>
-            <span class="absolute bottom-2 right-2 bg-black/75 text-white text-[11px] px-2 py-0.5 rounded font-medium">
+            <span class="absolute bottom-2 right-2 bg-black/80 text-amber-400 text-[11px] px-2 py-0.5 rounded font-bold border border-amber-500/40">
               <i class="fa-regular fa-images mr-1"></i>${currentIndex + 1}/${images.length}
             </span>
           ` : '';
 
           galleryHtml = `
-            <div class="relative mb-3">
-              <img src="${currentImg}" onclick="openLightbox('${currentImg}')" alt="${item.title}" class="w-full h-44 object-cover rounded-lg border border-slate-700 cursor-zoom-in">
+            <div class="relative mb-3 bg-slate-950 rounded-lg p-1 border-2 border-amber-600/60 shadow-inner">
+              <img src="${currentImg}" onclick="openLightbox('${currentImg}')" alt="${item.title}" class="w-full h-52 object-contain rounded cursor-zoom-in">
+              <span onclick="openLightbox('${currentImg}')" class="absolute top-2 left-2 bg-black/75 text-slate-200 text-[10px] px-2 py-0.5 rounded cursor-pointer hover:text-amber-400">
+                <i class="fa-solid fa-magnifying-glass-plus mr-1"></i>Powiększ screen
+              </span>
               ${navBtns}
             </div>
           `;
         }
-
-        const lvlBadge = meta.lvl
-          ? `<span class="text-xs bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-1 rounded font-bold">LVL ${meta.lvl}</span>`
-          : '';
 
         const profileLinkBtn = (item.category === 'Konta' && meta.profileUrl)
           ? `<a href="${meta.profileUrl}" target="_blank" rel="noopener noreferrer" class="mt-2 text-xs bg-purple-950/70 hover:bg-purple-900/80 border border-purple-600/50 text-purple-300 px-3 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition font-semibold">
@@ -662,25 +842,40 @@
              </a>`
           : '';
 
-        const middlemanBadge = meta.middleman
-          ? `<div class="mt-2 text-[11px] bg-indigo-950/60 border border-indigo-700/50 text-indigo-300 px-2.5 py-1 rounded flex items-center gap-1.5">
-               <i class="fa-solid fa-user-check text-indigo-400"></i> Dostępny Zaufany Handlarz (Middleman)
-             </div>`
-          : '';
-
         const isOwner = currentUser && (currentUser.username === item.seller || currentUser.tag === meta.discordTag);
         const deleteBtn = isOwner
           ? `<button onclick="deleteAuction(${item.id})" class="text-xs text-red-400 hover:text-red-300 cursor-pointer ml-2" title="Usuń swoją ofertę"><i class="fa-solid fa-trash"></i></button>`
           : '';
 
-        // Sekcja cen w zależności od typu oferty (Tylko Kup Teraz / Tylko Licytacja / Oba)
         let priceDisplayHtml = '';
         let actionButtonsHtml = '';
 
-        if (saleType === 'buynow') {
+        if (saleType === 'offers') {
+          priceDisplayHtml = `
+            <div class="flex justify-between items-center mb-3 bg-amber-950/30 border border-amber-700/40 px-3 py-2 rounded-lg">
+              <div>
+                <span class="text-xs text-amber-300 font-bold block">📦 Paczka / Zbieram oferty (${item.currency === 'PLN' ? 'PLN' : 'Złoto'})</span>
+                <span class="text-xs text-slate-400">Najwyższa propozycja: <strong class="text-white">${item.currentBid > 0 ? formatPrice(item.currentBid, item.currency) : 'Wpisz swoją ofertę'}</strong> (${item.lastBidder})</span>
+              </div>
+            </div>
+          `;
+          actionButtonsHtml = `
+            <div class="space-y-2">
+              <div class="flex gap-2">
+                <input type="text" id="bid-input-${item.id}" placeholder="Zaproponuj kwotę (np. 100 lub 300m)" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                <button onclick="placeCustomBid(${item.id})" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3.5 py-2 rounded-lg text-xs transition cursor-pointer">
+                  Złóż ofertę
+                </button>
+              </div>
+              <button onclick="openBuyModal(${item.id})" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-semibold py-2 rounded-lg text-xs transition cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-brands fa-discord"></i> Kontakt ze sprzedawcą / Handlarz
+              </button>
+            </div>
+          `;
+        } else if (saleType === 'buynow') {
           priceDisplayHtml = `
             <div class="flex justify-between items-center mb-3 bg-emerald-950/30 border border-emerald-800/40 px-3 py-2 rounded-lg">
-              <span class="text-xs text-emerald-300 font-medium">Oferta Kup Teraz:</span>
+              <span class="text-xs text-emerald-300 font-medium">Cena Kup Teraz (KT):</span>
               <span class="text-2xl font-extrabold text-emerald-400">${formatPrice(item.buyNow, item.currency)}</span>
             </div>
           `;
@@ -692,7 +887,7 @@
         } else if (saleType === 'auction') {
           priceDisplayHtml = `
             <div class="mb-3">
-              <span class="text-xs text-slate-400 block">Aktualna licytacja (${item.bidsCount || 0}):</span>
+              <span class="text-xs text-slate-400 block">Aktualna licytacja CW (${item.bidsCount || 0}):</span>
               <span class="text-2xl font-extrabold text-amber-400">${formatPrice(item.currentBid, item.currency)}</span>
               <span class="text-xs text-slate-500 block">Prowadzi: <strong class="text-slate-300">${item.lastBidder}</strong></span>
             </div>
@@ -709,12 +904,12 @@
           priceDisplayHtml = `
             <div class="flex justify-between items-end mb-3">
               <div>
-                <span class="text-xs text-slate-400 block">Aktualna oferta (${item.bidsCount || 0}):</span>
+                <span class="text-xs text-slate-400 block">CW / Oferta (${item.bidsCount || 0}):</span>
                 <span class="text-2xl font-extrabold text-amber-400">${formatPrice(item.currentBid, item.currency)}</span>
                 <span class="text-xs text-slate-500 block">Licytuje: <strong class="text-slate-300">${item.lastBidder}</strong></span>
               </div>
               <div class="text-right">
-                <span class="text-xs text-slate-400 block">Kup Teraz:</span>
+                <span class="text-xs text-slate-400 block">Kup Teraz (KT):</span>
                 <span class="text-lg font-bold text-emerald-400">${formatPrice(item.buyNow, item.currency)}</span>
               </div>
             </div>
@@ -724,7 +919,7 @@
               <div class="flex gap-2">
                 <input type="text" id="bid-input-${item.id}" placeholder="Kwota (np. 200 lub 50m)" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
                 <button onclick="placeCustomBid(${item.id})" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition cursor-pointer">
-                  Licytuj
+                  Podbij
                 </button>
               </div>
               <button onclick="openBuyModal(${item.id})" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 rounded-lg text-sm transition cursor-pointer flex items-center justify-center gap-2">
@@ -735,34 +930,33 @@
         }
 
         return `
-          <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-amber-500/50 transition shadow-lg">
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between hover:border-amber-500/60 transition shadow-lg">
             <div>
-              <div class="flex justify-between items-center gap-2 mb-3 flex-wrap">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-semibold px-2.5 py-1 rounded border ${badgeColor} flex items-center gap-1.5">
-                    <i class="fa-solid ${icon}"></i> ${item.category}
-                  </span>
+              <div class="flex justify-between items-center gap-1.5 mb-2.5 flex-wrap">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  ${tradeBadge}
+                  ${upgradeBadge}
                   ${lvlBadge}
+                  ${profsBadge}
                 </div>
-                <span class="text-xs bg-slate-950 text-slate-300 px-2.5 py-1 rounded border border-slate-800 font-medium">
+                <span class="text-xs bg-slate-950 text-amber-400 px-2.5 py-1 rounded border border-slate-800 font-bold">
                   🌍 ${item.world}
                 </span>
               </div>
 
               ${galleryHtml}
 
-              <h3 class="text-lg font-bold text-white mb-1">${item.title}</h3>
-              <p class="text-sm text-slate-400 mb-2">${cleanDesc}</p>
+              <h3 class="text-base font-extrabold text-white mb-1">${item.title}</h3>
+              <p class="text-xs text-slate-300 mb-2 whitespace-pre-line">${cleanDesc}</p>
               ${profileLinkBtn}
-              ${middlemanBadge}
             </div>
 
-            <div class="border-t border-slate-800 pt-4 mt-4">
+            <div class="border-t border-slate-800 pt-3 mt-3">
               ${priceDisplayHtml}
               ${actionButtonsHtml}
 
               <div class="mt-3 text-xs text-slate-500 flex justify-between items-center">
-                <span>Sprzedaje: <strong class="text-slate-300">${item.seller}</strong> ${deleteBtn}</span>
+                <span>Wystawił: <strong class="text-slate-300">${item.seller}</strong> ${deleteBtn}</span>
                 <span class="text-emerald-400 flex items-center gap-1"><i class="fa-brands fa-discord"></i> @${meta.discordTag}</span>
               </div>
             </div>
@@ -772,11 +966,11 @@
     }
 
     // ==========================================
-    // 6. DOWOLNA LICYTACJA Z PRZELICZNIKIEM (k / m / g)
+    // 7. LICYTACJA / SKŁADANIE OFERT
     // ==========================================
     async function placeCustomBid(id) {
       if (!currentUser) {
-        alert("Zaloguj się przez Discord, aby licytować!");
+        alert("Zaloguj się przez Discord, aby złożyć ofertę!");
         return;
       }
       const item = auctions.find(a => a.id === id);
@@ -791,8 +985,8 @@
         return;
       }
 
-      if (meta.saleType !== 'auction' && item.buyNow > 0 && customAmount >= Number(item.buyNow)) {
-        if (confirm(`Wpisana kwota (${formatPrice(customAmount, item.currency)}) osiąga lub przekracza cenę Kup Teraz (${formatPrice(item.buyNow, item.currency)}). Przejść od razu do zakupu?`)) {
+      if (meta.saleType === 'both' && item.buyNow > 0 && customAmount >= Number(item.buyNow)) {
+        if (confirm(`Wpisana kwota (${formatPrice(customAmount, item.currency)}) osiąga cenę Kup Teraz (${formatPrice(item.buyNow, item.currency)}). Przejść od razu do zakupu?`)) {
           openBuyModal(id);
         }
         return;
@@ -808,44 +1002,45 @@
         .eq('id', id);
 
       if (error) {
-        alert("Błąd podczas licytacji: " + error.message);
+        alert("Błąd podczas zapisu oferty: " + error.message);
         return;
       }
 
-      sendDiscordWebhook(`🔨 **Nowa oferta!** Gracz **${currentUser.username}** (@${currentUser.tag}) zalicytował **${formatPrice(customAmount, item.currency)}** za **${item.title}** (Świat: ${item.world})!`);
+      sendDiscordWebhook(`🔨 **Nowa oferta!** Gracz **${currentUser.username}** (@${currentUser.tag}) zaoferował **${formatPrice(customAmount, item.currency)}** za **${item.title}** (Świat: ${item.world})!`);
       await fetchAuctions();
     }
 
     // ==========================================
-    // 7. KUP TERAZ I AUTOMATYCZNY KANAŁ NA DISCORDZIE
+    // 8. KUP TERAZ I AUTOMATYCZNY KANAŁ NA DISCORDZIE
     // ==========================================
     function openBuyModal(id) {
       if (!currentUser) {
-        alert("Zaloguj się przez Discord, aby zobaczyć dane sprzedawcy i kupić przedmiot!");
+        alert("Zaloguj się przez Discord, aby zobaczyć dane sprzedawcy i otworzyć kanał wymiany!");
         return;
       }
       const item = auctions.find(a => a.id === id);
       if (!item) return;
 
       const { meta } = parseAuctionMeta(item);
+      const displayPrice = meta.saleType === 'offers' ? 'Wg ustaleń (Paczka / Oferta)' : formatPrice(item.buyNow, item.currency);
 
       const discordProfileBtn = meta.discordId
         ? `<a href="discord://-/users/${meta.discordId}" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-2 transition">
-             <i class="fa-brands fa-discord"></i> Napisz do sprzedawcy na Discordzie
+             <i class="fa-brands fa-discord"></i> Napisz bezpośrednio na Discordzie
            </a>`
         : '';
 
       const container = document.getElementById('buy-modal-content');
       container.innerHTML = `
         <div class="bg-slate-950 border border-slate-800 rounded-lg p-3">
-          <div class="text-xs text-slate-400">Kupujesz ofertę (Świat: ${item.world}):</div>
+          <div class="text-xs text-slate-400">Ogłoszenie (Świat: ${item.world}):</div>
           <div class="font-bold text-white text-base">${item.title}</div>
-          <div class="text-emerald-400 font-extrabold text-lg mt-1">Cena Kup Teraz: ${formatPrice(item.buyNow, item.currency)}</div>
+          <div class="text-emerald-400 font-extrabold text-lg mt-1">Kwota: ${displayPrice}</div>
         </div>
 
         <div class="bg-slate-950 border border-[#5865F2]/40 rounded-lg p-3.5 space-y-2.5">
           <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1.5">
-            <i class="fa-brands fa-discord text-[#5865F2]"></i> Dane kontaktowe sprzedawcy:
+            <i class="fa-brands fa-discord text-[#5865F2]"></i> Dane kontaktowe wystawiającego:
           </div>
           <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded border border-slate-800">
             <div>
@@ -863,15 +1058,19 @@
           <label class="flex items-start gap-2.5 cursor-pointer">
             <input type="checkbox" id="use-middleman-checkbox" ${meta.middleman ? 'checked' : ''} class="w-4 h-4 mt-0.5 accent-amber-500 rounded">
             <div class="text-xs">
-              <span class="font-bold text-indigo-300 block">Chcę wymianę przez Zaufanego Handlarza (Utwórz kanał)</span>
-              <span class="text-slate-400">Bot na Discordzie automatycznie stworzy prywatny kanał tekstowy tylko dla Ciebie, sprzedającego (<strong>@${meta.discordTag}</strong>) oraz Zaufanego Handlarza.</span>
+              <span class="font-bold text-indigo-300 block">Utwórz prywatny kanał z Zaufanym Handlarzem</span>
+              <span class="text-slate-400">Bot automatycznie stworzy na Discordzie pokój dla Ciebie, <strong>@${meta.discordTag}</strong> oraz Handlarza.</span>
             </div>
+          </label>
+          <label class="flex items-center gap-2.5 pt-2 border-t border-indigo-800/40 cursor-pointer">
+            <input type="checkbox" id="keep-listing-checkbox" ${meta.saleType === 'offers' ? 'checked' : ''} class="w-4 h-4 accent-amber-500 rounded">
+            <span class="text-[11px] text-slate-300">To paczka wielu przedmiotów – zostaw ogłoszenie aktywne na stronie (kupuję tylko wybrany item ze screena)</span>
           </label>
         </div>
 
         <div class="flex gap-2 pt-2">
           <button onclick="confirmPurchase(${item.id})" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-sm transition cursor-pointer">
-            Potwierdzam zakup
+            Potwierdź i Otwórz Kanał
           </button>
           <button onclick="closeBuyModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-lg text-sm transition cursor-pointer">
             Anuluj
@@ -894,11 +1093,11 @@
 
       const { meta } = parseAuctionMeta(item);
       const useMiddleman = document.getElementById('use-middleman-checkbox').checked;
+      const keepListing = document.getElementById('keep-listing-checkbox').checked;
       const middlemanId = localStorage.getItem('margo_middleman_id') || "";
-      const formattedPrice = formatPrice(item.buyNow, item.currency);
+      const formattedPrice = meta.saleType === 'offers' ? 'Wg ustaleń' : formatPrice(item.buyNow, item.currency);
 
       if (useMiddleman) {
-        // Specjalny znacznik !ticket dla bota w Pythonie, który automatycznie otworzy prywatny kanał
         const ticketPayload = {
           buyerId: currentUser.id || "",
           buyerTag: currentUser.tag,
@@ -912,71 +1111,58 @@
 
         sendDiscordWebhook(
           `!ticket ${JSON.stringify(ticketPayload)}\n` +
-          `🛡️ **NOWY TICKET HANDLOWY (ZAUFANY HANDLARZ)** 🛡️\n` +
-          `📦 Przedmiot: **${item.title}** (${item.world}) | Kwota: **${formattedPrice}**\n` +
+          `🛡️ **NOWY TICKET HANDLOWY** 🛡️\n` +
+          `📦 Oferta: **${item.title}** (${item.world}) | Kwota: **${formattedPrice}**\n` +
           `👤 Kupujący: <@${currentUser.id}> (@${currentUser.tag})\n` +
-          `👤 Sprzedający: ${meta.discordId ? `<@${meta.discordId}>` : ''} (@${meta.discordTag})\n` +
-          `🤝 Handlarz: ${middlemanId ? `<@${middlemanId}>` : 'Administrator'}`
-        );
-      } else {
-        sendDiscordWebhook(
-          `✅ **SPRZEDANE (KUP TERAZ)!**\n` +
-          `📦 **${item.title}** (${item.world}) za **${formattedPrice}**\n` +
-          `👤 Kupił: **${currentUser.username}** (@${currentUser.tag}) od **${item.seller}** (@${meta.discordTag})`
+          `👤 Sprzedający: ${meta.discordId ? `<@${meta.discordId}>` : ''} (@${meta.discordTag})`
         );
       }
 
-      const { error } = await supabaseClient.from('auctions').delete().eq('id', id);
-      if (error) {
-        alert("Błąd podczas finalizacji zakupu: " + error.message);
-        return;
+      if (!keepListing) {
+        await supabaseClient.from('auctions').delete().eq('id', id);
       }
 
       closeBuyModal();
-      alert(`Zakup potwierdzony! ${useMiddleman ? 'Bot na Discordzie właśnie tworzy dla Was prywatny kanał handlowy.' : `Skontaktuj się ze sprzedawcą (@${meta.discordTag}) na Discordzie.`}`);
+      alert(`Gotowe! ${useMiddleman ? 'Bot na Discordzie właśnie utworzył dla Was prywatny kanał wymiany.' : `Skontaktuj się z @${meta.discordTag} na Discordzie.`}`);
       await fetchAuctions();
     }
 
     async function deleteAuction(id) {
-      if (!confirm("Czy na pewno chcesz usunąć swoją aukcję?")) return;
+      if (!confirm("Czy na pewno chcesz usunąć swoje ogłoszenie?")) return;
       const { error } = await supabaseClient.from('auctions').delete().eq('id', id);
       if (!error) await fetchAuctions();
     }
 
     // ==========================================
-    // 8. DODAWANIE OFERTY
+    // 9. PUBLIKOWANIE OGŁOSZENIA + ROZSYŁANIE NA KANAŁY DISCORD
     // ==========================================
     async function addAuction(e) {
       e.preventDefault();
       const saleType = document.getElementById('item-sale-type').value;
+      const tradeType = document.getElementById('item-trade-type').value;
       const curr = document.getElementById('item-currency').value;
+      const category = document.getElementById('item-category').value;
 
       const rawPrice = document.getElementById('item-price').value;
       const rawBuyNow = document.getElementById('item-buynow').value;
 
-      let price = saleType === 'buynow' ? 0 : parseAmountInput(rawPrice, curr);
-      let buyNow = saleType === 'auction' ? 0 : parseAmountInput(rawBuyNow, curr);
+      let price = 0;
+      let buyNow = 0;
 
       if (saleType === 'both') {
-        if (price <= 0 || buyNow <= 0) {
-          alert("Podaj prawidłową cenę wywoławczą oraz cenę Kup Teraz!");
-          return;
-        }
-        if (buyNow <= price) {
-          alert("Cena Kup Teraz musi być wyższa niż cena wywoławcza!");
+        price = parseAmountInput(rawPrice, curr);
+        buyNow = parseAmountInput(rawBuyNow, curr);
+        if (price <= 0 || buyNow <= 0 || buyNow <= price) {
+          alert("Podaj prawidłową cenę wywoławczą (CW) oraz wyższą cenę Kup Teraz (KT)!");
           return;
         }
       } else if (saleType === 'buynow') {
-        if (buyNow <= 0) {
-          alert("Podaj prawidłową cenę Kup Teraz!");
-          return;
-        }
+        buyNow = parseAmountInput(rawBuyNow, curr);
+        if (buyNow <= 0) { alert("Podaj prawidłową cenę Kup Teraz!"); return; }
         price = buyNow;
       } else if (saleType === 'auction') {
-        if (price <= 0) {
-          alert("Podaj prawidłową cenę wywoławczą!");
-          return;
-        }
+        price = parseAmountInput(rawPrice, curr);
+        if (price <= 0) { alert("Podaj prawidłową cenę wywoławczą!"); return; }
         buyNow = price * 999999;
       }
 
@@ -985,12 +1171,15 @@
       btn.innerText = "Publikowanie...";
 
       const rawImgs = document.getElementById('item-imgs').value;
-      const imgList = rawImgs.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+      const urlList = rawImgs.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+      const allImages = [...pastedImagesData, ...urlList];
 
       const lvlVal = Number(document.getElementById('item-lvl').value) || null;
       const cleanDesc = document.getElementById('item-desc').value.trim() || "Brak dodatkowego opisu.";
       const allowMiddleman = document.getElementById('item-middleman').checked;
       const profileUrl = document.getElementById('item-profile-url').value.trim();
+      const rarity = document.getElementById('item-rarity').value;
+      const upgrade = document.getElementById('item-upgrade').value;
 
       const metaObj = {
         lvl: lvlVal,
@@ -998,6 +1187,10 @@
         discordId: currentUser.id,
         middleman: allowMiddleman,
         saleType: saleType,
+        tradeType: tradeType,
+        rarity: category === 'Przedmioty' ? rarity : '',
+        upgrade: category === 'Przedmioty' ? upgrade : '',
+        profs: category === 'Przedmioty' ? selectedProfs : [],
         profileUrl: profileUrl
       };
 
@@ -1005,12 +1198,12 @@
 
       const newAuction = {
         title: document.getElementById('item-title').value,
-        category: document.getElementById('item-category').value,
+        category: category,
         world: document.getElementById('item-world').value,
         currency: curr,
         currentBid: price,
         buyNow: buyNow,
-        img: JSON.stringify(imgList),
+        img: JSON.stringify(allImages),
         description: packedDescription,
         seller: currentUser.username,
         lastBidder: "Brak ofert",
@@ -1020,26 +1213,44 @@
       const { error } = await supabaseClient.from('auctions').insert([newAuction]);
 
       btn.disabled = false;
-      btn.innerText = "Opublikuj ofertę";
+      btn.innerText = "Opublikuj ogłoszenie";
 
       if (error) {
         alert("Błąd zapisu do bazy: " + error.message);
         return;
       }
 
-      closeAddModal();
-      e.target.reset();
-      toggleAccountLinkField();
-      toggleSaleTypeFields();
-      await fetchAuctions();
+      // Wysyłamy specjalny znacznik !oferta dla bota, żeby przekierował na odpowiedni kanał (#sprzedaż-item, #sprzedaż-złota itd.)
+      const routePayload = {
+        tradeType: tradeType,
+        category: category,
+        world: newAuction.world,
+        title: newAuction.title,
+        upgrade: upgrade,
+        lvl: lvlVal,
+        desc: cleanDesc,
+        priceText: saleType === 'offers' ? 'Zbieram oferty (CW/KT)' : (saleType === 'buynow' ? `KT: ${formatPrice(buyNow, curr)}` : `CW: ${formatPrice(price, curr)}`),
+        sellerTag: currentUser.tag,
+        sellerId: currentUser.id
+      };
 
       sendDiscordWebhook(
-        `📢 **Nowa oferta na Margoplaats!**\n` +
-        `📦 **${newAuction.title}** ${lvlVal ? `(LVL ${lvlVal})` : ''} | **${newAuction.category}** | Świat: **${newAuction.world}**\n` +
-        `💰 ${saleType === 'buynow' ? `Kup Teraz: **${formatPrice(buyNow, curr)}**` : `Wywoławcza: **${formatPrice(price, curr)}**`}\n` +
-        `👤 Wystawił: **${currentUser.username}** (@${currentUser.tag})\n` +
-        `🔗 ${REDIRECT_URI}`
+        `!oferta ${JSON.stringify(routePayload)}\n` +
+        `📢 **[${tradeType === 'BUY' ? 'KUPIĘ' : 'SPRZEDAM'} - ${category.toUpperCase()}]** Świat: **${newAuction.world}**\n` +
+        `📦 **${newAuction.title}** ${upgrade ? `[${upgrade}]` : ''} ${lvlVal ? `(${lvlVal} lvl)` : ''}\n` +
+        `📝 ${cleanDesc}\n` +
+        `💰 **${routePayload.priceText}** | 👤 Kontakt: <@${currentUser.id}> (@${currentUser.tag})\n` +
+        `🔗 Zobacz screeny i licytuj: ${REDIRECT_URI}`
       );
+
+      pastedImagesData = [];
+      selectedProfs = [];
+      renderPastedImagesPreview();
+      closeAddModal();
+      e.target.reset();
+      toggleFormFieldsByCategory();
+      toggleSaleTypeFields();
+      await fetchAuctions();
     }
 
     function openAddModal() {
